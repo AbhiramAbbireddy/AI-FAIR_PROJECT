@@ -45,6 +45,13 @@ from src.role_mapping.matcher import match_roles, RoleMatch
 from src.skill_extraction.extractor import extract_skills, extract_text
 from src.skill_gap.ranker import rank_skill_gaps
 
+# New comprehensive gap analysis
+try:
+    from src.skill_gap_analysis import SkillGapAnalysis
+    HAS_GAP_ANALYSIS = True
+except ImportError:
+    HAS_GAP_ANALYSIS = False
+
 
 # ---------------------------------------------------------------------------
 # Cached loaders — run only once across reruns
@@ -68,6 +75,22 @@ def _cached_load_jobs():
         jobs_df = pd.DataFrame()
     postings = load_static_jobs(max_rows=5000)
     return jobs_df, postings
+
+
+@st.cache_resource(show_spinner="Loading comprehensive gap analysis…")
+def _load_gap_analyzer():
+    """Pre-load comprehensive gap analysis system."""
+    if not HAS_GAP_ANALYSIS:
+        return None
+    try:
+        from src.skill_gap_analysis import SkillGapAnalysis
+        analyzer = SkillGapAnalysis()
+        return analyzer
+    except Exception as e:
+        import traceback
+        print(f"Warning: Could not load advanced gap analysis: {e}")
+        print(traceback.format_exc())
+        return None
 
 # ---------------------------------------------------------------------------
 # Page configuration
@@ -135,6 +158,7 @@ def _init_state():
         "gaps",
         "trends",
         "fairness",
+        "comprehensive_gap_analysis",
     ):
         if key not in st.session_state:
             st.session_state[key] = None
@@ -145,6 +169,7 @@ _init_state()
 # Pre-load expensive resources on first run
 _load_sbert()
 _jobs_df, _postings = _cached_load_jobs()
+_gap_analyzer = _load_gap_analyzer() if HAS_GAP_ANALYSIS else None
 
 
 # ---------------------------------------------------------------------------
@@ -163,6 +188,29 @@ with st.sidebar:
     use_ner = st.toggle("Use NER extraction", value=True, help="RoBERTa NER for contextual skill detection.")
     top_n = st.slider("Top N role suggestions", 5, 30, 10)
     min_score = st.slider("Minimum match score", 0, 80, 10, step=5)
+    
+    st.divider()
+    st.subheader("🎓 Learning Preferences")
+    experience_level = st.selectbox(
+        "Your Experience Level",
+        ["beginner", "intermediate", "advanced"],
+        help="Used to personalize learning path difficulty and pace"
+    )
+    available_time = st.selectbox(
+        "Time to Dedicate",
+        ["part-time (2 hrs/day)", "full-time (6-8 hrs/day)", "minimal (1 hr/day)"],
+        help="Affects learning timeline and curriculum density"
+    )
+    learning_style = st.selectbox(
+        "Preferred Learning Style",
+        ["hands-on (projects)", "theory-first (courses)", "mixed"],
+        help="Influences resource recommendations"
+    )
+    budget = st.selectbox(
+        "Budget for Learning",
+        ["free only", "budget-friendly (<$100)", "willing-to-invest"],
+        help="Filters course recommendations"
+    )
 
     st.divider()
     run_btn = st.button("🚀 Analyse Resume", type="primary", use_container_width=True)
@@ -211,6 +259,56 @@ if run_btn and uploaded is not None:
         else:
             gaps = []
         st.session_state.gaps = gaps
+
+        # 4b — Comprehensive skill gap analysis
+        st.write("📊 Running comprehensive gap analysis…")
+        comprehensive_analysis = None
+        try:
+            # Try to use cached analyzer first
+            if _gap_analyzer is not None:
+                analyzer_to_use = _gap_analyzer
+                st.write("  Using cached analyzer…")
+            else:
+                # If not cached, try to load it now
+                st.write("  Loading gap analyzer…")
+                from src.skill_gap_analysis import SkillGapAnalysis
+                analyzer_to_use = SkillGapAnalysis()
+            
+            # Run analysis only if we have role matches and skills
+            if role_matches and skill_names and analyzer_to_use:
+                st.write("  Computing priority rankings, learning paths, and quick wins…")
+                top_role = role_matches[0]
+                job_data = {
+                    'role': top_role.role,
+                    'description': top_role.description,
+                    'core_skills': list(set(top_role.matched_core + top_role.missing_core)),
+                    'optional_skills': list(set(top_role.matched_optional)),
+                    'match_score': top_role.score,
+                }
+                
+                # Build user context from sidebar preferences
+                user_context = {
+                    "experience_level": experience_level,
+                    "available_time": available_time.split()[0],  # "part-time" from "part-time (2 hrs/day)"
+                    "learning_style": learning_style.split()[0],  # "hands-on" from "hands-on (projects)"
+                    "budget": budget.split()[0]  # "free" from "free only"
+                }
+                
+                comprehensive_analysis = analyzer_to_use.analyze_for_job(
+                    user_skills=skill_names,
+                    job_data=job_data,
+                    current_match_score=top_role.score,
+                    user_context=user_context,
+                )
+                st.session_state.comprehensive_gap_analysis = comprehensive_analysis
+                st.write("  ✅ Comprehensive analysis complete!")
+            else:
+                st.write("  ⚠️ Skipping (need matched roles and skills)")
+        except Exception as e:
+            import traceback
+            st.error(f"Gap analysis error: {str(e)[:200]}")
+            if st.checkbox("Show full error trace"):
+                st.code(traceback.format_exc())
 
         # 5 — Trends
         st.write("📈 Computing trends…")
@@ -347,12 +445,389 @@ if st.session_state.skills is not None:
 
     # ── TAB: Skill Gaps ───────────────────────────────────────────────
     with tab_gaps:
-        gaps: list[SkillGap] = st.session_state.gaps or []
         st.subheader("Skill Gap Analysis")
+        
+        # Use comprehensive gap analysis if available
+        comprehensive = st.session_state.comprehensive_gap_analysis
+        gaps: list[SkillGap] = st.session_state.gaps or []
 
-        if not gaps:
-            st.info("No skill gap data available. Ensure job data exists in the processed directory.")
+        # Debug: Show what we have
+        if st.checkbox("📊 Show Analysis Debug Info"):
+            st.write(f"Comprehensive analysis available: {comprehensive is not None}")
+            st.write(f"Basic gaps available: {len(gaps) > 0}")
+            st.write(f"HAS_GAP_ANALYSIS: {HAS_GAP_ANALYSIS}")
+            if comprehensive:
+                st.write(f"Comprehensive keys: {list(comprehensive.keys())}")
+
+        if comprehensive and comprehensive.get('ranked_priorities'):
+            # ─── COMPREHENSIVE GAP ANALYSIS ────────────────────
+            st.success("📊 **Advanced Gap Analysis** — AI-powered comprehensive skill gap evaluation")
+            
+            # Summary metrics
+            col1, col2, col3, col4 = st.columns(4)
+            gaps_by_cat = comprehensive.get('gaps_by_category', {})
+            ranked_priorities = comprehensive.get('ranked_priorities', [])
+            learning_path = comprehensive.get('learning_path', {})
+            
+            with col1:
+                total_gaps = (len(gaps_by_cat.get('critical', [])) + 
+                             len(gaps_by_cat.get('important', [])) + 
+                             len(gaps_by_cat.get('nice_to_have', [])))
+                st.metric("📌 Total Gaps", total_gaps)
+            
+            with col2:
+                st.metric("🔴 Critical", len(gaps_by_cat.get('critical', [])))
+            
+            with col3:
+                st.metric("🟠 Important", len(gaps_by_cat.get('important', [])))
+            
+            with col4:
+                st.metric("🟢 Nice-to-have", len(gaps_by_cat.get('nice_to_have', [])))
+            
+            # Tabs for different gap analysis views
+            gap_tab1, gap_tab2, gap_tab3, gap_tab4 = st.tabs(
+                ["🎯 Priority Ranking", "📅 Learning Path", "⚡ Quick Wins", "📊 Breakdown"]
+            )
+            
+            # ─── TAB 1: PRIORITY RANKING ─────────────────────
+            with gap_tab1:
+                st.markdown("### Ranked Skills by Priority")
+                
+                if ranked_priorities:
+                    # Top priority skills
+                    for idx, skill_data in enumerate(ranked_priorities[:10], 1):
+                        skill = skill_data.get('skill', 'Unknown')
+                        priority = skill_data.get('priority_score', 0)
+                        tier = skill_data.get('rank_tier', 'LOW')
+                        breakdown = skill_data.get('breakdown', {})
+                        
+                        # Safe conversion to int with fallback
+                        try:
+                            learning_time = int(skill_data.get('learning_time_months', 0) or 0)
+                        except (ValueError, TypeError):
+                            learning_time = 0
+                        
+                        try:
+                            salary_boost = int(skill_data.get('salary_boost_inr', 0) or 0)
+                        except (ValueError, TypeError):
+                            salary_boost = 0
+                        
+                        category = skill_data.get('category', 'OTHER')
+                        
+                        # Color coding for tier
+                        tier_color = {
+                            'CRITICAL': '🔴',
+                            'HIGH': '🟠',
+                            'MEDIUM': '🟡',
+                            'LOW': '🟢',
+                        }.get(tier, '⚪')
+                        
+                        with st.expander(
+                            f"{tier_color} **#{idx} — {skill.title()}** "
+                            f"(Score: {priority:.1f}/100 • {category})",
+                            expanded=idx <= 3
+                        ):
+                            col_score, col_learn, col_salary = st.columns(3)
+                            
+                            with col_score:
+                                st.metric(f"Priority Score", f"{priority:.1f}", 
+                                         delta=f"{tier}")
+                                # Score breakdown
+                                st.caption("**Score Breakdown:**")
+                                for factor, value in breakdown.items():
+                                    st.text(f"  {factor.replace('_', ' ').title()}: {value:.0f}")
+                            
+                            with col_learn:
+                                st.metric("Time to Learn", f"{learning_time} months")
+                                # Time gauge
+                                ease_score = breakdown.get('learning_ease', 50)
+                                st.progress(min(ease_score / 100, 1.0))
+                                st.caption(f"*Difficulty: {100 - ease_score:.0f}%*")
+                            
+                            with col_salary:
+                                if salary_boost > 0:
+                                    st.metric("Salary Boost", f"₹{salary_boost:,.0f}")
+                                    st.success(f"+{(salary_boost/100000):.1f}L potential")
+                                else:
+                                    st.metric("Salary Boost", "N/A")
+                            
+                            # Recommendation
+                            recommendation = skill_data.get('recommendation', '')
+                            if recommendation:
+                                st.markdown(f"**💡 Recommendation:**\n{recommendation}")
+                else:
+                    st.success("✅ No gaps identified or all high-priority skills already present!")
+            
+            # ─── TAB 2: LEARNING PATH ────────────────────────
+            with gap_tab2:
+                st.markdown("### 📅 Month-by-Month Learning Timeline")
+                
+                if learning_path:
+                    # Check if this is LLM-generated (new structure) or rule-based (old structure)
+                    is_llm_path = isinstance(learning_path, dict) and 'learning_path' in learning_path
+                    
+                    if is_llm_path:
+                        # LLM-GENERATED LEARNING PATH
+                        path_data = learning_path.get('learning_path', {})
+                        
+                        # Summary metrics
+                        initial_score = path_data.get('initial_match_score', 0)
+                        target_score = path_data.get('target_match_score', 90)
+                        total_duration = path_data.get('total_duration_months', 6)
+                        total_hours = path_data.get('estimated_hours_total', 'N/A')
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        col1.metric("Current Score", f"{initial_score:.0f}%")
+                        col2.metric("Target Score", f"{target_score:.0f}%", delta=f"+{target_score - initial_score:.0f}%")
+                        col3.metric("Duration", f"{total_duration} months")
+                        col4.metric("Total Hours", f"~{total_hours}")
+                        
+                        st.divider()
+                        
+                        # Display milestones
+                        milestones = path_data.get('milestones', [])
+                        if milestones:
+                            st.markdown("#### 🎯 Month-by-Month Milestones")
+                            
+                            for idx, milestone in enumerate(milestones, 1):
+                                with st.expander(
+                                    f"Month {milestone.get('month', idx)}: {milestone.get('skill', 'Unknown')} "
+                                    f"({milestone.get('category', 'N/A')}) → {milestone.get('match_score_after', 0):.0f}%",
+                                    expanded=(idx <= 2)
+                                ):
+                                    # Milestone details
+                                    col_left, col_right = st.columns([2, 1])
+                                    
+                                    with col_left:
+                                        st.caption(f"**Week:** {milestone.get('week_range', 'N/A')}")
+                                        st.caption(f"**Time Commitment:** {milestone.get('estimated_hours_per_week', 8)} hours/week")
+                                        st.caption(f"**Difficulty:** {milestone.get('difficulty', 'moderate')}")
+                                        
+                                        # Learning objectives
+                                        objectives = milestone.get('learning_objectives', [])
+                                        if objectives:
+                                            st.write("**🎓 Learning Objectives:**")
+                                            for obj in objectives:
+                                                st.write(f"  ✓ {obj}")
+                                        
+                                        # Resources
+                                        resources = milestone.get('resources', [])
+                                        if resources:
+                                            st.write("**📚 Recommended Resources:**")
+                                            for resource in resources:
+                                                res_name = resource.get('name', 'Resource')
+                                                res_type = resource.get('type', 'resource')
+                                                res_cost = resource.get('cost', 'N/A')
+                                                res_platform = resource.get('platform', 'Online')
+                                                st.write(f"  📖 **{res_name}** ({res_platform}) - {res_cost}")
+                                        
+                                        # Practice projects
+                                        projects = milestone.get('practice_projects', [])
+                                        if projects:
+                                            st.write("**🛠️ Practice Projects:**")
+                                            for project in projects:
+                                                st.write(f"  ⚙️ {project}")
+                                        
+                                        # Success criteria
+                                        criteria = milestone.get('success_criteria', [])
+                                        if criteria:
+                                            st.write("**✅ Success Criteria:**")
+                                            for criterion in criteria:
+                                                st.write(f"  ☑️ {criterion}")
+                                    
+                                    with col_right:
+                                        # Score progress
+                                        score_after = milestone.get('match_score_after', 0)
+                                        score_improvement = milestone.get('score_improvement', 0)
+                                        st.metric(
+                                            "Match After",
+                                            f"{score_after:.0f}%",
+                                            delta=f"+{score_improvement:.0f}%"
+                                        )
+                        
+                        # Quick wins section
+                        quick_wins = path_data.get('quick_wins', [])
+                        if quick_wins:
+                            st.divider()
+                            st.markdown("#### ⚡ Quick Wins (Start Here!)")
+                            for qw in quick_wins:
+                                st.success(
+                                    f"**{qw.get('skill', 'Skill')}**: {qw.get('why_quick_win', 'High impact')} | "
+                                    f"Time: {qw.get('time_needed', 'N/A')}"
+                                )
+                        
+                        # Recommendations
+                        recommendations = path_data.get('key_recommendations', [])
+                        if recommendations:
+                            st.divider()
+                            st.markdown("#### 💡 Key Recommendations")
+                            for rec in recommendations:
+                                st.write(f"✓ {rec}")
+                        
+                        # Show powered by
+                        st.divider()
+                        st.caption("✨ Powered by Google Gemini AI - Personalized learning path")
+                    
+                    elif learning_path and learning_path.get('milestones'):
+                        # RULE-BASED LEARNING PATH (Enhanced with detailed information)
+                        initial_score = learning_path.get('initial_match_score', 0)
+                        final_score = learning_path.get('final_match_score', initial_score)
+                        total_improvement = learning_path.get('total_improvement', 0)
+                        total_duration = learning_path.get('total_duration_months', 0)
+                        milestones = learning_path.get('milestones', [])
+                        
+                        # Summary
+                        col1, col2, col3, col4 = st.columns(4)
+                        col1.metric("Starting Score", f"{initial_score:.0f}%")
+                        col2.metric("Projected Score", f"{final_score:.0f}%", delta=f"+{total_improvement:.0f}%")
+                        col3.metric("Duration", f"{total_duration:.0f} months")
+                        col4.metric("Skills to Learn", len([m for m in milestones if m.get('type') == 'priority']))
+                        
+                        st.divider()
+                        st.markdown("#### 🎯 Month-by-Month Milestones")
+                        
+                        # Display milestones with expandable details
+                        for idx, milestone in enumerate(milestones[:12], 1):
+                            skill_name = milestone.get('skill', 'Unknown')
+                            category = milestone.get('category', 'IMPORTANT')
+                            duration = milestone.get('duration_months', 0)
+                            score_after = milestone.get('match_score_after', 0)
+                            difficulty = milestone.get('difficulty', 'moderate')
+                            
+                            # Color code by category
+                            category_emoji = {
+                                'CRITICAL': '🔴',
+                                'IMPORTANT': '🟠',
+                                'NICE_TO_HAVE': '🟢'
+                            }.get(category, '⚪')
+                            
+                            with st.expander(
+                                f"Month {milestone.get('month', idx)}: {skill_name.title()} {category_emoji} "
+                                f"({category}) → {score_after:.0f}%",
+                                expanded=(idx <= 2)
+                            ):
+                                col_left, col_right = st.columns([2, 1])
+                                
+                                with col_left:
+                                    st.caption(f"**Week:** {milestone.get('week_range', 'N/A')}")
+                                    st.caption(f"**Time Commitment:** {milestone.get('estimated_hours_per_week', 8)} hours/week")
+                                    st.caption(f"**Duration:** {duration} months")
+                                    st.caption(f"**Difficulty:** {difficulty.title()}")
+                                    
+                                    # Learning objectives
+                                    objectives = milestone.get('learning_objectives', [])
+                                    if objectives:
+                                        st.write("**🎓 Learning Objectives:**")
+                                        for obj in objectives:
+                                            st.write(f"  ✓ {obj}")
+                                    
+                                    # Resources
+                                    resources = milestone.get('resources', [])
+                                    if resources:
+                                        st.write("**📚 Recommended Resources:**")
+                                        for resource in resources:
+                                            res_name = resource.get('name', 'Resource') if isinstance(resource, dict) else resource
+                                            res_type = resource.get('type', 'resource').title() if isinstance(resource, dict) else 'Resource'
+                                            res_platform = resource.get('platform', 'Online') if isinstance(resource, dict) else 'Online'
+                                            res_cost = resource.get('cost', 'varies') if isinstance(resource, dict) else 'varies'
+                                            st.write(f"  📖 **{res_name}** ({res_platform}) - {res_cost}")
+                                    
+                                    # Practice projects
+                                    projects = milestone.get('practice_projects', [])
+                                    if projects:
+                                        st.write("**🛠️ Practice Projects:**")
+                                        for project in projects:
+                                            st.write(f"  ⚙️ {project}")
+                                    
+                                    # Success criteria
+                                    criteria = milestone.get('success_criteria', [])
+                                    if criteria:
+                                        st.write("**✅ Success Criteria:**")
+                                        for criterion in criteria:
+                                            st.write(f"  ☑️ {criterion}")
+                                
+                                with col_right:
+                                    score_improvement = milestone.get('score_improvement', 0)
+                                    st.metric(
+                                        "Match After",
+                                        f"{score_after:.0f}%",
+                                        delta=f"+{score_improvement:.0f}%" if score_improvement > 0 else None
+                                    )
+                else:
+                    st.info("📅 Learning path will be generated once gaps are identified")
+            
+            # ─── TAB 3: QUICK WINS ───────────────────────────────
+            with gap_tab3:
+                st.markdown("### ⚡ Quick Wins — Learn Fast, High Impact")
+                
+                quick_wins = comprehensive.get('quick_wins', [])
+                
+                if quick_wins:
+                    cols_per_row = 3
+                    for idx in range(0, len(quick_wins), cols_per_row):
+                        cols = st.columns(cols_per_row)
+                        for col_idx, skill_data in enumerate(quick_wins[idx:idx+cols_per_row]):
+                            with cols[col_idx]:
+                                skill = skill_data.get('skill', 'Unknown')
+                                priority = skill_data.get('priority_score', 0)
+                                learning_time = skill_data.get('learning_time_months', 0)
+                                ease = skill_data.get('learning_ease', 50)
+                                
+                                st.markdown(
+                                    f"""
+                                    **{skill.title()}**
+                                    
+                                    • Priority: {priority:.0f}/100
+                                    • Learn in: {learning_time} months
+                                    • Difficulty: {"Easy" if ease > 80 else "Moderate"}
+                                    
+                                    ✅ **High ROI** — Learn quickly!
+                                    """
+                                )
+                else:
+                    st.success("✅ No quick wins needed — you're on track!")
+            
+            # ─── TAB 4: BREAKDOWN ────────────────────────────────
+            with gap_tab4:
+                st.markdown("### 📊 Gaps by Category")
+                
+                # Category summary
+                critical = gaps_by_cat.get('critical', [])
+                important = gaps_by_cat.get('important', [])
+                nice = gaps_by_cat.get('nice_to_have', [])
+                
+                # Donut chart data
+                category_counts = [len(critical), len(important), len(nice)]
+                category_labels = ['Critical', 'Important', 'Nice-to-have']
+                
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    chart_data = pd.DataFrame({
+                        'Category': category_labels,
+                        'Count': category_counts
+                    })
+                    st.bar_chart(chart_data.set_index('Category'), use_container_width=True)
+                
+                with col2:
+                    for label, count, color in zip(category_labels, category_counts, ['🔴', '🟠', '🟢']):
+                        st.metric(f"{color} {label}", count)
+                
+                # Detailed list
+                for label, skills, emoji in [
+                    ('CRITICAL', critical, '🔴'),
+                    ('IMPORTANT', important, '🟠'),
+                    ('NICE-TO-HAVE', nice, '🟢'),
+                ]:
+                    if skills:
+                        st.markdown(f"### {emoji} {label}")
+                        cols = st.columns(3)
+                        for idx, skill in enumerate(skills):
+                            cols[idx % 3].markdown(f"• {skill.title()}")
+
         else:
+            # Fallback to basic analysis
+            st.info("📊 **Basic Gap Analysis** — Standard skill gap evaluation")
+            
             # Summary counts
             high = sum(1 for g in gaps if g.priority == "High")
             med = sum(1 for g in gaps if g.priority == "Medium")

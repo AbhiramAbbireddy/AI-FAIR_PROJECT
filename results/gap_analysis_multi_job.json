@@ -1,0 +1,845 @@
+{
+  "individual_job_analyses": {
+    "Data Scientist": {
+      "job_title": "Data Scientist",
+      "current_match_score": 68,
+      "total_gaps": 4,
+      "gaps_breakdown": {
+        "critical": 2,
+        "important": 0,
+        "nice_to_have": 2
+      },
+      "gaps_by_category": {
+        "critical": [
+          "machine learning",
+          "statistics"
+        ],
+        "important": [
+          "tensorflow",
+          "tableau"
+        ],
+        "nice_to_have": []
+      },
+      "ranked_priorities": [
+        {
+          "skill": "machine learning",
+          "priority_score": 90.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 95,
+            "learning_ease": 60,
+            "salary_impact": 95
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 6,
+          "salary_boost_inr": 600000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "statistics",
+          "priority_score": 86.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 75,
+            "learning_ease": 80,
+            "salary_impact": 75
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 4,
+          "salary_boost_inr": 350000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "tensorflow",
+          "priority_score": 86.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 80,
+            "salary_impact": 95
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 4,
+          "salary_boost_inr": 550000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "tableau",
+          "priority_score": 81.0,
+          "rank_tier": "HIGH",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 75,
+            "learning_ease": 95,
+            "salary_impact": 75
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 2,
+          "salary_boost_inr": 350000,
+          "recommendation": "Important for this role. Learn within next 2-3 months."
+        }
+      ],
+      "learning_path": {
+        "initial_match_score": 68,
+        "final_match_score": 76.0,
+        "total_improvement": 8.0,
+        "improvement_percentage": 11.8,
+        "total_duration_months": 13,
+        "months_remaining": -1,
+        "timeline_complete": false,
+        "milestones": [
+          {
+            "skill": "statistics",
+            "type": "prerequisite",
+            "start_month": 1,
+            "end_month": 4,
+            "duration_months": 4,
+            "match_score_after": 68,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for machine learning"
+          },
+          {
+            "skill": "linear algebra",
+            "type": "prerequisite",
+            "start_month": 5,
+            "end_month": 7,
+            "duration_months": 3,
+            "match_score_after": 68,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for machine learning"
+          },
+          {
+            "skill": "machine learning",
+            "type": "priority",
+            "priority_rank": 1,
+            "start_month": 8,
+            "end_month": 13,
+            "duration_months": 6,
+            "priority_score": 90.0,
+            "category": "CRITICAL",
+            "difficulty": "hard",
+            "learning_resources": [
+              "Andrew Ng's ML Course",
+              "Fast.ai",
+              "Coursera"
+            ],
+            "match_score_after": 76.0,
+            "score_gain": 8.0,
+            "is_prerequisite": false
+          }
+        ],
+        "quarters": {
+          "Q1": [],
+          "Q2": [
+            {
+              "skill": "statistics",
+              "type": "prerequisite",
+              "start_month": 1,
+              "end_month": 4,
+              "duration_months": 4,
+              "match_score_after": 68,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for machine learning"
+            }
+          ],
+          "Q3": [
+            {
+              "skill": "linear algebra",
+              "type": "prerequisite",
+              "start_month": 5,
+              "end_month": 7,
+              "duration_months": 3,
+              "match_score_after": 68,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for machine learning"
+            }
+          ],
+          "Q4": [
+            {
+              "skill": "machine learning",
+              "type": "priority",
+              "priority_rank": 1,
+              "start_month": 8,
+              "end_month": 13,
+              "duration_months": 6,
+              "priority_score": 90.0,
+              "category": "CRITICAL",
+              "difficulty": "hard",
+              "learning_resources": [
+                "Andrew Ng's ML Course",
+                "Fast.ai",
+                "Coursera"
+              ],
+              "match_score_after": 76.0,
+              "score_gain": 8.0,
+              "is_prerequisite": false
+            }
+          ]
+        },
+        "priority_skills": 1,
+        "prerequisite_skills": 2
+      },
+      "quick_wins": [
+        {
+          "skill": "tableau",
+          "priority_score": 81.0,
+          "learning_ease": 95,
+          "learning_time_months": 2,
+          "reason": "High priority (81/100) and quick to learn (2 months)"
+        }
+      ],
+      "long_term_investments": [],
+      "user_analysis": {
+        "explicit_skills": 4,
+        "implicit_skills": 4,
+        "total_effective_skills": 8
+      }
+    },
+    "Machine Learning Engineer": {
+      "job_title": "Machine Learning Engineer",
+      "current_match_score": 61,
+      "total_gaps": 6,
+      "gaps_breakdown": {
+        "critical": 3,
+        "important": 0,
+        "nice_to_have": 3
+      },
+      "gaps_by_category": {
+        "critical": [
+          "machine learning",
+          "machine learning",
+          "pytorch"
+        ],
+        "important": [
+          "docker",
+          "kubernetes",
+          "tensorflow"
+        ],
+        "nice_to_have": []
+      },
+      "ranked_priorities": [
+        {
+          "skill": "machine learning",
+          "priority_score": 90.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 95,
+            "learning_ease": 60,
+            "salary_impact": 95
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 6,
+          "salary_boost_inr": 600000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "machine learning",
+          "priority_score": 90.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 95,
+            "learning_ease": 60,
+            "salary_impact": 95
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 6,
+          "salary_boost_inr": 600000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "pytorch",
+          "priority_score": 88.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 75,
+            "learning_ease": 80,
+            "salary_impact": 95
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 4,
+          "salary_boost_inr": 550000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "docker",
+          "priority_score": 87.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 95,
+            "salary_impact": 75
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 2,
+          "salary_boost_inr": 350000,
+          "recommendation": "URGENT: Quick win! Learn this skill immediately - high priority and relatively easy."
+        },
+        {
+          "skill": "tensorflow",
+          "priority_score": 86.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 80,
+            "salary_impact": 95
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 4,
+          "salary_boost_inr": 550000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "kubernetes",
+          "priority_score": 84.0,
+          "rank_tier": "HIGH",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 80,
+            "salary_impact": 75
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 4,
+          "salary_boost_inr": 450000,
+          "recommendation": "Market-hot skill! Good career move to learn this soon."
+        }
+      ],
+      "learning_path": {
+        "initial_match_score": 61,
+        "final_match_score": 69.0,
+        "total_improvement": 8.0,
+        "improvement_percentage": 13.1,
+        "total_duration_months": 13,
+        "months_remaining": -1,
+        "timeline_complete": false,
+        "milestones": [
+          {
+            "skill": "statistics",
+            "type": "prerequisite",
+            "start_month": 1,
+            "end_month": 4,
+            "duration_months": 4,
+            "match_score_after": 61,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for machine learning"
+          },
+          {
+            "skill": "linear algebra",
+            "type": "prerequisite",
+            "start_month": 5,
+            "end_month": 7,
+            "duration_months": 3,
+            "match_score_after": 61,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for machine learning"
+          },
+          {
+            "skill": "machine learning",
+            "type": "priority",
+            "priority_rank": 1,
+            "start_month": 8,
+            "end_month": 13,
+            "duration_months": 6,
+            "priority_score": 90.0,
+            "category": "CRITICAL",
+            "difficulty": "hard",
+            "learning_resources": [
+              "Andrew Ng's ML Course",
+              "Fast.ai",
+              "Coursera"
+            ],
+            "match_score_after": 69.0,
+            "score_gain": 8.0,
+            "is_prerequisite": false
+          }
+        ],
+        "quarters": {
+          "Q1": [],
+          "Q2": [
+            {
+              "skill": "statistics",
+              "type": "prerequisite",
+              "start_month": 1,
+              "end_month": 4,
+              "duration_months": 4,
+              "match_score_after": 61,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for machine learning"
+            }
+          ],
+          "Q3": [
+            {
+              "skill": "linear algebra",
+              "type": "prerequisite",
+              "start_month": 5,
+              "end_month": 7,
+              "duration_months": 3,
+              "match_score_after": 61,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for machine learning"
+            }
+          ],
+          "Q4": [
+            {
+              "skill": "machine learning",
+              "type": "priority",
+              "priority_rank": 1,
+              "start_month": 8,
+              "end_month": 13,
+              "duration_months": 6,
+              "priority_score": 90.0,
+              "category": "CRITICAL",
+              "difficulty": "hard",
+              "learning_resources": [
+                "Andrew Ng's ML Course",
+                "Fast.ai",
+                "Coursera"
+              ],
+              "match_score_after": 69.0,
+              "score_gain": 8.0,
+              "is_prerequisite": false
+            }
+          ]
+        },
+        "priority_skills": 1,
+        "prerequisite_skills": 2
+      },
+      "quick_wins": [
+        {
+          "skill": "docker",
+          "priority_score": 87.0,
+          "learning_ease": 95,
+          "learning_time_months": 2,
+          "reason": "High priority (87/100) and quick to learn (2 months)"
+        }
+      ],
+      "long_term_investments": [],
+      "user_analysis": {
+        "explicit_skills": 4,
+        "implicit_skills": 4,
+        "total_effective_skills": 8
+      }
+    },
+    "Full Stack Developer": {
+      "job_title": "Full Stack Developer",
+      "current_match_score": 72,
+      "total_gaps": 6,
+      "gaps_breakdown": {
+        "critical": 3,
+        "important": 0,
+        "nice_to_have": 3
+      },
+      "gaps_by_category": {
+        "critical": [
+          "react",
+          "databases"
+        ],
+        "important": [
+          "rest",
+          "docker",
+          "amazon web services",
+          "testing"
+        ],
+        "nice_to_have": []
+      },
+      "ranked_priorities": [
+        {
+          "skill": "docker",
+          "priority_score": 87.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 95,
+            "salary_impact": 75
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 2,
+          "salary_boost_inr": 350000,
+          "recommendation": "URGENT: Quick win! Learn this skill immediately - high priority and relatively easy."
+        },
+        {
+          "skill": "react",
+          "priority_score": 86.0,
+          "rank_tier": "CRITICAL",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 75,
+            "learning_ease": 80,
+            "salary_impact": 75
+          },
+          "category": "CRITICAL",
+          "learning_time_months": 4,
+          "salary_boost_inr": 280000,
+          "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+        },
+        {
+          "skill": "rest",
+          "priority_score": 83.5,
+          "rank_tier": "HIGH",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 95,
+            "learning_ease": 95,
+            "salary_impact": 40
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": 1,
+          "salary_boost_inr": 200000,
+          "recommendation": "Market-hot skill! Good career move to learn this soon."
+        },
+        {
+          "skill": "databases",
+          "priority_score": 70.0,
+          "rank_tier": "HIGH",
+          "breakdown": {
+            "job_importance": 100,
+            "market_demand": 50,
+            "learning_ease": 50,
+            "salary_impact": 50
+          },
+          "category": "CRITICAL",
+          "learning_time_months": "Unknown",
+          "salary_boost_inr": "N/A",
+          "recommendation": "Important for this role. Learn within next 2-3 months."
+        },
+        {
+          "skill": "amazon web services",
+          "priority_score": 62.0,
+          "rank_tier": "MEDIUM",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 50,
+            "learning_ease": 50,
+            "salary_impact": 50
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": "Unknown",
+          "salary_boost_inr": "N/A",
+          "recommendation": "Useful but not urgent. Plan to learn within 6 months."
+        },
+        {
+          "skill": "testing",
+          "priority_score": 62.0,
+          "rank_tier": "MEDIUM",
+          "breakdown": {
+            "job_importance": 80,
+            "market_demand": 50,
+            "learning_ease": 50,
+            "salary_impact": 50
+          },
+          "category": "IMPORTANT",
+          "learning_time_months": "Unknown",
+          "salary_boost_inr": "N/A",
+          "recommendation": "Useful but not urgent. Plan to learn within 6 months."
+        }
+      ],
+      "learning_path": {
+        "initial_match_score": 72,
+        "final_match_score": 90.0,
+        "total_improvement": 18.0,
+        "improvement_percentage": 25.0,
+        "total_duration_months": 12,
+        "months_remaining": 0,
+        "timeline_complete": true,
+        "milestones": [
+          {
+            "skill": "linux basics",
+            "type": "prerequisite",
+            "start_month": 1,
+            "end_month": 1,
+            "duration_months": 1,
+            "match_score_after": 72,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for docker"
+          },
+          {
+            "skill": "docker",
+            "type": "priority",
+            "priority_rank": 1,
+            "start_month": 2,
+            "end_month": 3,
+            "duration_months": 2,
+            "priority_score": 87.0,
+            "category": "IMPORTANT",
+            "difficulty": "moderate",
+            "learning_resources": [
+              "Docker Docs",
+              "Docker for Developers",
+              "Udemy"
+            ],
+            "match_score_after": 77.0,
+            "score_gain": 5.0,
+            "is_prerequisite": false
+          },
+          {
+            "skill": "html",
+            "type": "prerequisite",
+            "start_month": 4,
+            "end_month": 4,
+            "duration_months": 1,
+            "match_score_after": 77.0,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for react"
+          },
+          {
+            "skill": "css",
+            "type": "prerequisite",
+            "start_month": 5,
+            "end_month": 5,
+            "duration_months": 1,
+            "match_score_after": 77.0,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for react"
+          },
+          {
+            "skill": "react",
+            "type": "priority",
+            "priority_rank": 2,
+            "start_month": 6,
+            "end_month": 9,
+            "duration_months": 4,
+            "priority_score": 86.0,
+            "category": "CRITICAL",
+            "difficulty": "moderate",
+            "learning_resources": [
+              "React Docs",
+              "Scrimba",
+              "Udemy React courses"
+            ],
+            "match_score_after": 85.0,
+            "score_gain": 8.0,
+            "is_prerequisite": false
+          },
+          {
+            "skill": "http",
+            "type": "prerequisite",
+            "start_month": 10,
+            "end_month": 10,
+            "duration_months": 1,
+            "match_score_after": 85.0,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for rest"
+          },
+          {
+            "skill": "json",
+            "type": "prerequisite",
+            "start_month": 11,
+            "end_month": 11,
+            "duration_months": 1,
+            "match_score_after": 85.0,
+            "is_prerequisite": true,
+            "reason": "Prerequisite for rest"
+          },
+          {
+            "skill": "rest",
+            "type": "priority",
+            "priority_rank": 3,
+            "start_month": 12,
+            "end_month": 12,
+            "duration_months": 1,
+            "priority_score": 83.5,
+            "category": "IMPORTANT",
+            "difficulty": "easy",
+            "learning_resources": [
+              "REST API Design",
+              "RESTful Best Practices",
+              "Udemy"
+            ],
+            "match_score_after": 90.0,
+            "score_gain": 5.0,
+            "is_prerequisite": false
+          }
+        ],
+        "quarters": {
+          "Q1": [
+            {
+              "skill": "linux basics",
+              "type": "prerequisite",
+              "start_month": 1,
+              "end_month": 1,
+              "duration_months": 1,
+              "match_score_after": 72,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for docker"
+            },
+            {
+              "skill": "docker",
+              "type": "priority",
+              "priority_rank": 1,
+              "start_month": 2,
+              "end_month": 3,
+              "duration_months": 2,
+              "priority_score": 87.0,
+              "category": "IMPORTANT",
+              "difficulty": "moderate",
+              "learning_resources": [
+                "Docker Docs",
+                "Docker for Developers",
+                "Udemy"
+              ],
+              "match_score_after": 77.0,
+              "score_gain": 5.0,
+              "is_prerequisite": false
+            }
+          ],
+          "Q2": [
+            {
+              "skill": "html",
+              "type": "prerequisite",
+              "start_month": 4,
+              "end_month": 4,
+              "duration_months": 1,
+              "match_score_after": 77.0,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for react"
+            },
+            {
+              "skill": "css",
+              "type": "prerequisite",
+              "start_month": 5,
+              "end_month": 5,
+              "duration_months": 1,
+              "match_score_after": 77.0,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for react"
+            }
+          ],
+          "Q3": [
+            {
+              "skill": "react",
+              "type": "priority",
+              "priority_rank": 2,
+              "start_month": 6,
+              "end_month": 9,
+              "duration_months": 4,
+              "priority_score": 86.0,
+              "category": "CRITICAL",
+              "difficulty": "moderate",
+              "learning_resources": [
+                "React Docs",
+                "Scrimba",
+                "Udemy React courses"
+              ],
+              "match_score_after": 85.0,
+              "score_gain": 8.0,
+              "is_prerequisite": false
+            }
+          ],
+          "Q4": [
+            {
+              "skill": "http",
+              "type": "prerequisite",
+              "start_month": 10,
+              "end_month": 10,
+              "duration_months": 1,
+              "match_score_after": 85.0,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for rest"
+            },
+            {
+              "skill": "json",
+              "type": "prerequisite",
+              "start_month": 11,
+              "end_month": 11,
+              "duration_months": 1,
+              "match_score_after": 85.0,
+              "is_prerequisite": true,
+              "reason": "Prerequisite for rest"
+            },
+            {
+              "skill": "rest",
+              "type": "priority",
+              "priority_rank": 3,
+              "start_month": 12,
+              "end_month": 12,
+              "duration_months": 1,
+              "priority_score": 83.5,
+              "category": "IMPORTANT",
+              "difficulty": "easy",
+              "learning_resources": [
+                "REST API Design",
+                "RESTful Best Practices",
+                "Udemy"
+              ],
+              "match_score_after": 90.0,
+              "score_gain": 5.0,
+              "is_prerequisite": false
+            }
+          ]
+        },
+        "priority_skills": 3,
+        "prerequisite_skills": 5
+      },
+      "quick_wins": [
+        {
+          "skill": "docker",
+          "priority_score": 87.0,
+          "learning_ease": 95,
+          "learning_time_months": 2,
+          "reason": "High priority (87/100) and quick to learn (2 months)"
+        },
+        {
+          "skill": "rest",
+          "priority_score": 83.5,
+          "learning_ease": 95,
+          "learning_time_months": 1,
+          "reason": "High priority (84/100) and quick to learn (1 months)"
+        }
+      ],
+      "long_term_investments": [],
+      "user_analysis": {
+        "explicit_skills": 4,
+        "implicit_skills": 4,
+        "total_effective_skills": 8
+      }
+    }
+  },
+  "universal_skills": [
+    {
+      "skill": "machine learning",
+      "appears_in_jobs": 3,
+      "job_list": [
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "Machine Learning Engineer"
+      ],
+      "universality_score": 100.0,
+      "average_priority": 90.0,
+      "recommendation": "MASTER SKILL: Learn this first! Will help you across multiple roles."
+    },
+    {
+      "skill": "tensorflow",
+      "appears_in_jobs": 2,
+      "job_list": [
+        "Data Scientist",
+        "Machine Learning Engineer"
+      ],
+      "universality_score": 66.7,
+      "average_priority": 86.0,
+      "recommendation": "Meta-skill: High ROI. Invest time here early."
+    },
+    {
+      "skill": "docker",
+      "appears_in_jobs": 2,
+      "job_list": [
+        "Machine Learning Engineer",
+        "Full Stack Developer"
+      ],
+      "universality_score": 66.7,
+      "average_priority": 87.0,
+      "recommendation": "Meta-skill: High ROI. Invest time here early."
+    }
+  ],
+  "overall_recommendation": "\ud83c\udfaf PRIMARY RECOMMENDATION:\nLearning 'machine learning' should be your #1 priority.\nThis skill will improve your match for 3 out of 3 roles (100.0% universality).\nPriority Score: 90.0/100\nMASTER SKILL: Learn this first! Will help you across multiple roles.",
+  "total_jobs_analyzed": 3,
+  "summary": "Analyzed 3 jobs\nAverage match score: 67.0%\nTotal unique skill gaps: 12\nUniversal skills (appear in 50%+ of roles): 3"
+}

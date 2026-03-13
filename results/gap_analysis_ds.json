@@ -1,0 +1,262 @@
+{
+  "job_title": "Senior Data Scientist",
+  "current_match_score": 65.0,
+  "total_gaps": 8,
+  "gaps_breakdown": {
+    "critical": 3,
+    "important": 1,
+    "nice_to_have": 4
+  },
+  "gaps_by_category": {
+    "critical": [
+      "machine learning",
+      "machine learning",
+      "tensorflow"
+    ],
+    "important": [
+      "statistics",
+      "amazon web services",
+      "kubernetes"
+    ],
+    "nice_to_have": [
+      "tableau",
+      "docker"
+    ]
+  },
+  "ranked_priorities": [
+    {
+      "skill": "tensorflow",
+      "priority_score": 94.0,
+      "rank_tier": "CRITICAL",
+      "breakdown": {
+        "job_importance": 100,
+        "market_demand": 95,
+        "learning_ease": 80,
+        "salary_impact": 95
+      },
+      "category": "CRITICAL",
+      "learning_time_months": 4,
+      "salary_boost_inr": 550000,
+      "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+    },
+    {
+      "skill": "machine learning",
+      "priority_score": 90.0,
+      "rank_tier": "CRITICAL",
+      "breakdown": {
+        "job_importance": 100,
+        "market_demand": 95,
+        "learning_ease": 60,
+        "salary_impact": 95
+      },
+      "category": "CRITICAL",
+      "learning_time_months": 6,
+      "salary_boost_inr": 600000,
+      "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+    },
+    {
+      "skill": "machine learning",
+      "priority_score": 90.0,
+      "rank_tier": "CRITICAL",
+      "breakdown": {
+        "job_importance": 100,
+        "market_demand": 95,
+        "learning_ease": 60,
+        "salary_impact": 95
+      },
+      "category": "CRITICAL",
+      "learning_time_months": 6,
+      "salary_boost_inr": 600000,
+      "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+    },
+    {
+      "skill": "kubernetes",
+      "priority_score": 86.0,
+      "rank_tier": "CRITICAL",
+      "breakdown": {
+        "job_importance": 85,
+        "market_demand": 95,
+        "learning_ease": 80,
+        "salary_impact": 75
+      },
+      "category": "IMPORTANT",
+      "learning_time_months": 4,
+      "salary_boost_inr": 450000,
+      "recommendation": "URGENT: High priority despite learning difficulty. Start learning now."
+    },
+    {
+      "skill": "statistics",
+      "priority_score": 78.0,
+      "rank_tier": "HIGH",
+      "breakdown": {
+        "job_importance": 80,
+        "market_demand": 75,
+        "learning_ease": 80,
+        "salary_impact": 75
+      },
+      "category": "IMPORTANT",
+      "learning_time_months": 4,
+      "salary_boost_inr": 350000,
+      "recommendation": "Important for this role. Learn within next 2-3 months."
+    },
+    {
+      "skill": "docker",
+      "priority_score": 75.0,
+      "rank_tier": "HIGH",
+      "breakdown": {
+        "job_importance": 50,
+        "market_demand": 95,
+        "learning_ease": 95,
+        "salary_impact": 75
+      },
+      "category": "NICE_TO_HAVE",
+      "learning_time_months": 2,
+      "salary_boost_inr": 350000,
+      "recommendation": "Market-hot skill! Good career move to learn this soon."
+    },
+    {
+      "skill": "tableau",
+      "priority_score": 69.0,
+      "rank_tier": "MEDIUM",
+      "breakdown": {
+        "job_importance": 50,
+        "market_demand": 75,
+        "learning_ease": 95,
+        "salary_impact": 75
+      },
+      "category": "NICE_TO_HAVE",
+      "learning_time_months": 2,
+      "salary_boost_inr": 350000,
+      "recommendation": "Good skill to have. Can be learned quickly if time permits."
+    },
+    {
+      "skill": "amazon web services",
+      "priority_score": 62.0,
+      "rank_tier": "MEDIUM",
+      "breakdown": {
+        "job_importance": 80,
+        "market_demand": 50,
+        "learning_ease": 50,
+        "salary_impact": 50
+      },
+      "category": "IMPORTANT",
+      "learning_time_months": "Unknown",
+      "salary_boost_inr": "N/A",
+      "recommendation": "Useful but not urgent. Plan to learn within 6 months."
+    }
+  ],
+  "learning_path": {
+    "initial_match_score": 65.0,
+    "final_match_score": 73.0,
+    "total_improvement": 8.0,
+    "improvement_percentage": 12.3,
+    "total_duration_months": 14,
+    "months_remaining": -2,
+    "timeline_complete": false,
+    "milestones": [
+      {
+        "skill": "machine learning",
+        "type": "prerequisite",
+        "start_month": 1,
+        "end_month": 6,
+        "duration_months": 6,
+        "match_score_after": 65.0,
+        "is_prerequisite": true,
+        "reason": "Prerequisite for tensorflow"
+      },
+      {
+        "skill": "tensorflow",
+        "type": "priority",
+        "priority_rank": 1,
+        "start_month": 7,
+        "end_month": 10,
+        "duration_months": 4,
+        "priority_score": 94.0,
+        "category": "CRITICAL",
+        "difficulty": "hard",
+        "learning_resources": [
+          "TensorFlow Docs",
+          "TensorFlow Certificate",
+          "Udemy"
+        ],
+        "match_score_after": 73.0,
+        "score_gain": 8.0,
+        "is_prerequisite": false
+      },
+      {
+        "skill": "statistics",
+        "type": "prerequisite",
+        "start_month": 11,
+        "end_month": 14,
+        "duration_months": 4,
+        "match_score_after": 73.0,
+        "is_prerequisite": true,
+        "reason": "Prerequisite for machine learning"
+      }
+    ],
+    "quarters": {
+      "Q1": [],
+      "Q2": [
+        {
+          "skill": "machine learning",
+          "type": "prerequisite",
+          "start_month": 1,
+          "end_month": 6,
+          "duration_months": 6,
+          "match_score_after": 65.0,
+          "is_prerequisite": true,
+          "reason": "Prerequisite for tensorflow"
+        }
+      ],
+      "Q3": [],
+      "Q4": [
+        {
+          "skill": "tensorflow",
+          "type": "priority",
+          "priority_rank": 1,
+          "start_month": 7,
+          "end_month": 10,
+          "duration_months": 4,
+          "priority_score": 94.0,
+          "category": "CRITICAL",
+          "difficulty": "hard",
+          "learning_resources": [
+            "TensorFlow Docs",
+            "TensorFlow Certificate",
+            "Udemy"
+          ],
+          "match_score_after": 73.0,
+          "score_gain": 8.0,
+          "is_prerequisite": false
+        },
+        {
+          "skill": "statistics",
+          "type": "prerequisite",
+          "start_month": 11,
+          "end_month": 14,
+          "duration_months": 4,
+          "match_score_after": 73.0,
+          "is_prerequisite": true,
+          "reason": "Prerequisite for machine learning"
+        }
+      ]
+    },
+    "priority_skills": 1,
+    "prerequisite_skills": 2
+  },
+  "quick_wins": [
+    {
+      "skill": "docker",
+      "priority_score": 75.0,
+      "learning_ease": 95,
+      "learning_time_months": 2,
+      "reason": "High priority (75/100) and quick to learn (2 months)"
+    }
+  ],
+  "long_term_investments": [],
+  "user_analysis": {
+    "explicit_skills": 7,
+    "implicit_skills": 7,
+    "total_effective_skills": 14
+  }
+}
