@@ -1,0 +1,102 @@
+{
+  "test_date": "2026-03-13 18:54:23",
+  "categories": {
+    "ACCOUNTANT": {
+      "resume_count": 118,
+      "avg_skills": 7.06
+    },
+    "ADVOCATE": {
+      "resume_count": 118,
+      "avg_skills": 7.81
+    },
+    "AGRICULTURE": {
+      "resume_count": 63,
+      "avg_skills": 8.24
+    },
+    "APPAREL": {
+      "resume_count": 97,
+      "avg_skills": 6.76
+    },
+    "ARTS": {
+      "resume_count": 103,
+      "avg_skills": 7.78
+    },
+    "AUTOMOBILE": {
+      "resume_count": 36,
+      "avg_skills": 8.58
+    },
+    "AVIATION": {
+      "resume_count": 117,
+      "avg_skills": 8.34
+    },
+    "BANKING": {
+      "resume_count": 115,
+      "avg_skills": 8.12
+    },
+    "BPO": {
+      "resume_count": 22,
+      "avg_skills": 9.73
+    },
+    "BUSINESS-DEVELOPMENT": {
+      "resume_count": 120,
+      "avg_skills": 7.22
+    },
+    "CHEF": {
+      "resume_count": 118,
+      "avg_skills": 4.76
+    },
+    "CONSTRUCTION": {
+      "resume_count": 112,
+      "avg_skills": 7.87
+    },
+    "CONSULTANT": {
+      "resume_count": 115,
+      "avg_skills": 10.54
+    },
+    "DESIGNER": {
+      "resume_count": 107,
+      "avg_skills": 8.41
+    },
+    "DIGITAL-MEDIA": {
+      "resume_count": 96,
+      "avg_skills": 8.31
+    },
+    "ENGINEERING": {
+      "resume_count": 118,
+      "avg_skills": 11.56
+    },
+    "FINANCE": {
+      "resume_count": 118,
+      "avg_skills": 7.14
+    },
+    "FITNESS": {
+      "resume_count": 117,
+      "avg_skills": 6.03
+    },
+    "HEALTHCARE": {
+      "resume_count": 115,
+      "avg_skills": 8.7
+    },
+    "HR": {
+      "resume_count": 110,
+      "avg_skills": 8.77
+    },
+    "INFORMATION-TECHNOLOGY": {
+      "resume_count": 120,
+      "avg_skills": 13.27
+    },
+    "PUBLIC-RELATIONS": {
+      "resume_count": 111,
+      "avg_skills": 8.58
+    },
+    "SALES": {
+      "resume_count": 116,
+      "avg_skills": 6.36
+    },
+    "TEACHER": {
+      "resume_count": 102,
+      "avg_skills": 6.55
+    }
+  },
+  "fairness_status": "\u25d0 NEEDS IMPROVEMENT"
+}

@@ -1,0 +1,11 @@
+{
+  "test_date": "2026-03-13 18:54:23",
+  "jobs_sampled": 4735,
+  "avg_required_skills": 6.11,
+  "avg_preferred_skills": 0.0,
+  "skill_match_analysis": {
+    "total_pairs_tested": 1000,
+    "matching_pairs": 353,
+    "match_rate_percent": 35.3
+  }
+}

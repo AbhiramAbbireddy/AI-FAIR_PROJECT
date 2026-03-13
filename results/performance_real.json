@@ -1,0 +1,10 @@
+{
+  "test_date": "2026-03-13 18:54:23",
+  "processing_stats": {
+    "resumes_processed": 2484,
+    "total_skills_parsed": 20210,
+    "parse_time_seconds": 0.003,
+    "avg_time_per_resume_ms": 0.0,
+    "throughput_resumes_per_second": 806584.43
+  }
+}

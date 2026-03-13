@@ -1,0 +1,9 @@
+2026-03-06 11:54:29 | errors | ERROR | failing_function failed: Test error
+2026-03-06 11:54:29 | errors | ERROR | Traceback (most recent call last):
+  File "E:\AI-FAIR_PROJECT\src\utils\error_handler.py", line 43, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\AI-FAIR_PROJECT\test_system.py", line 223, in failing_function
+    raise ValueError("Test error")
+ValueError: Test error
+

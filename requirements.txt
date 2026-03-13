@@ -1,0 +1,26 @@
+# FAIR-PATH Dependencies
+# AI-Powered Resume-Job Matching System
+
+# Core ML/NLP
+torch>=2.0.0
+transformers>=4.30.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+
+# Data Processing
+pandas>=2.1.0
+pdfplumber>=0.10.0
+tqdm>=4.65.0
+
+# UI
+streamlit>=1.30.0
+
+# Explainability
+shap>=0.42.0
+
+# Time Series (for trend forecasting)
+statsmodels>=0.14.0
+
+# Utilities
+python-dateutil>=2.8.0
+pillow>=10.0.0

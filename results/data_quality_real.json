@@ -1,0 +1,20 @@
+{
+  "test_date": "2026-03-13 18:54:23",
+  "resume_stats": {
+    "total_resumes": 2484,
+    "categories": 24,
+    "null_skills": 16,
+    "null_text": 1
+  },
+  "job_stats": {
+    "total_jobs": 4735,
+    "with_description": 4735,
+    "with_required_skills": 4735,
+    "with_preferred_skills": 0
+  },
+  "data_completeness": {
+    "resume_completeness_percent": 99.36,
+    "job_completeness_percent": 50.0,
+    "overall_completeness_percent": 74.68
+  }
+}
