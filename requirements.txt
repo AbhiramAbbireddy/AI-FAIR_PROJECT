@@ -21,6 +21,10 @@ shap>=0.42.0
 # Time Series (for trend forecasting)
 statsmodels>=0.14.0
 
+# LLM Learning Path
+groq>=0.9.0
+python-dotenv>=1.0.0
+
 # Utilities
 python-dateutil>=2.8.0
 pillow>=10.0.0

@@ -45,6 +45,7 @@ from src.resume_parser import parse_resume
 from src.shap_explainer import MatchSHAPExplainer
 from src.skill_extractor import extract_skills
 from src.skill_gap.ranker import rank_skill_gaps
+from src.learning_path_visualizer import render_learning_path
 from src.trend_forecaster import get_skill_trends, get_trends_for_skills
 
 # New comprehensive gap analysis
@@ -62,7 +63,7 @@ except ImportError:
 @st.cache_data(show_spinner="Loading job database…")
 def _cached_load_jobs():
     if os.path.exists(JOBS_PARSED_PATH):
-        return pd.read_csv(JOBS_PARSED_PATH, nrows=5000)
+        return pd.read_csv(JOBS_PARSED_PATH, nrows=2000)
     return pd.DataFrame()
 
 
@@ -184,7 +185,7 @@ with st.sidebar:
     )
     st.divider()
     st.subheader("⚙️ Options")
-    use_ner = st.toggle("Use NER extraction", value=True, help="RoBERTa NER for contextual skill detection.")
+    use_ner = st.toggle("Use NER extraction", value=False, help="RoBERTa NER improves extraction but makes analysis slower.")
     top_n = st.slider("Top N role suggestions", 5, 30, 10)
     min_score = st.slider("Minimum match score", 0, 80, 10, step=5)
     
@@ -277,13 +278,13 @@ if run_btn and uploaded is not None:
             st.session_state.match_explanations = explainer.explain_job_matches(
                 text,
                 skill_names,
-                matches[:5],
+                matches[:3],
                 postings,
             )
             st.session_state.role_explanations = explainer.explain_role_matches(
                 text,
                 skill_names,
-                role_matches[:5],
+                role_matches[:3],
             )
         except Exception as exc:
             st.warning(f"Explainability fallback activated: {str(exc)[:180]}")
@@ -758,9 +759,9 @@ if st.session_state.skills is not None:
                         path_data = learning_path.get('learning_path', {})
                         
                         # Summary metrics
-                        initial_score = path_data.get('initial_match_score', 0)
-                        target_score = path_data.get('target_match_score', 90)
-                        total_duration = path_data.get('total_duration_months', 6)
+                        initial_score = comprehensive.get('current_match_score', 0) if comprehensive else 0
+                        target_score = path_data.get('final_match_score', 90)
+                        total_duration = path_data.get('total_months', 6)
                         total_hours = path_data.get('estimated_hours_total', 'N/A')
                         
                         col1, col2, col3, col4 = st.columns(4)
@@ -770,15 +771,24 @@ if st.session_state.skills is not None:
                         col4.metric("Total Hours", f"~{total_hours}")
                         
                         st.divider()
-                        
+                        render_learning_path(path_data, initial_score=float(initial_score))
+                        st.divider()
+
                         # Display milestones
                         milestones = path_data.get('milestones', [])
                         if milestones:
                             st.markdown("#### 🎯 Month-by-Month Milestones")
                             
                             for idx, milestone in enumerate(milestones, 1):
+                                month_start = milestone.get('month_start', idx)
+                                month_end = milestone.get('month_end', month_start)
+                                month_label = (
+                                    f"Month {month_start}"
+                                    if month_start == month_end
+                                    else f"Months {month_start}-{month_end}"
+                                )
                                 with st.expander(
-                                    f"Month {milestone.get('month', idx)}: {milestone.get('skill', 'Unknown')} "
+                                    f"{month_label}: {milestone.get('skill', 'Unknown')} "
                                     f"({milestone.get('category', 'N/A')}) → {milestone.get('match_score_after', 0):.0f}%",
                                     expanded=(idx <= 2)
                                 ):

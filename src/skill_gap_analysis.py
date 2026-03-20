@@ -46,7 +46,7 @@ class SkillGapAnalysis:
         if HAS_LLM and LLMLearningPathGenerator:
             try:
                 self.llm_generator = LLMLearningPathGenerator()
-                self.use_llm = True
+                self.use_llm = bool(getattr(self.llm_generator, "available", True))
                 print("✓ LLM-powered learning paths enabled (Gemini API)")
             except Exception as e:
                 print(f"⚠ LLM not available: {e}")
@@ -173,7 +173,7 @@ class SkillGapAnalysis:
                 "implicit_skills": len(gaps["implicit_skills"]),
                 "total_effective_skills": len(gaps["user_skills_with_implicit"])
             },
-            "powered_by": "Gemini AI (LLM)" if self.use_llm else "Rule-based"
+            "powered_by": "Groq AI (LLM)" if self.use_llm else "Rule-based"
         }
     
     def analyze_for_multiple_jobs(self, user_skills: List[str],
