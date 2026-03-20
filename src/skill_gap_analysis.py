@@ -56,7 +56,8 @@ class SkillGapAnalysis:
             print("  Using rule-based learning paths instead")
     
     def analyze_for_job(self, user_skills: List[str], job_data: Dict,
-                       current_match_score: float = 0, user_context: Optional[Dict] = None) -> Dict:
+                       current_match_score: float = 0, user_context: Optional[Dict] = None,
+                       trend_data: Optional[Dict] = None) -> Dict:
         """Complete skill gap analysis for ONE job.
         
         Full pipeline:
@@ -88,6 +89,9 @@ class SkillGapAnalysis:
             - quick wins
             - long-term investments
         """
+        if trend_data:
+            self.ranker.update_trend_data(trend_data)
+
         # Provide default current_match_score if not provided
         if current_match_score <= 0:
             current_match_score = 50  # Default placeholder

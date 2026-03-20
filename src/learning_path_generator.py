@@ -274,19 +274,74 @@ class LearningPathGenerator:
         total_improvement = final_score - initial_score
         total_duration = timeline[-1]["end_month"] if timeline else 0
         
+        # Wrap in "learning_path" key to match LLM generator format
         return {
-            "initial_match_score": round(initial_score, 1),
-            "final_match_score": round(final_score, 1),
-            "total_improvement": round(total_improvement, 1),
-            "improvement_percentage": round((total_improvement / initial_score * 100) if initial_score > 0 else 0, 1),
-            "total_duration_months": total_duration,
-            "months_remaining": max_months - total_duration,
-            "timeline_complete": total_duration <= max_months,
-            "milestones": timeline,
-            "quarters": self._group_by_quarter(timeline),
-            "priority_skills": len([t for t in timeline if t["type"] == "priority"]),
-            "prerequisite_skills": len([t for t in timeline if t["type"] == "prerequisite"])
+            "learning_path": {
+                "initial_match_score": round(initial_score, 1),
+                "target_match_score": min(initial_score + (total_improvement or 20), 100),
+                "final_match_score": round(final_score, 1),
+                "total_improvement": round(total_improvement, 1),
+                "improvement_percentage": round((total_improvement / initial_score * 100) if initial_score > 0 else 0, 1),
+                "total_duration_months": total_duration,
+                "estimated_hours_total": total_duration * 32,  # Estimate 32 hours per month
+                "months_remaining": max_months - total_duration,
+                "timeline_complete": total_duration <= max_months,
+                "milestones": timeline,
+                "quarters": self._group_by_quarter(timeline),
+                "priority_skills": len([t for t in timeline if t["type"] == "priority"]),
+                "prerequisite_skills": len([t for t in timeline if t["type"] == "prerequisite"]),
+                "quick_wins": self._identify_quick_wins(timeline),
+                "key_recommendations": [
+                    "Start with highest priority skills",
+                    "Build projects to reinforce learning",
+                    "Join communities for peer support",
+                    "Track progress and celebrate milestones"
+                ]
+            }
         }
+    
+    def _identify_quick_wins(self, timeline: List[Dict]) -> List[Dict]:
+        """Identify high-impact, low-effort skills (quick wins).
+        
+        Quick wins are skills that:
+        - Can be learned in 1-2 months
+        - Improve match score significantly
+        
+        Args:
+            timeline: List of timeline items
+            
+        Returns:
+            List of quick win opportunities
+        """
+        quick_wins = []
+        
+        for skill_data in timeline[:3]:  # First few skills are typically quick wins
+            if skill_data.get("duration_months", 3) <= 2:
+                quick_wins.append({
+                    "skill": skill_data.get("skill", "Unknown"),
+                    "why_quick_win": "Can be learned quickly with high impact",
+                    "time_needed": f"{skill_data.get('duration_months', 1)}-2 weeks",
+                    "impact": f"+{skill_data.get('score_improvement', 5):.0f}% match score",
+                    "difficulty": skill_data.get("difficulty", "moderate")
+                })
+        
+        # If not enough quick wins, add the highest priority ones
+        if len(quick_wins) < 3:
+            for skill_data in timeline:
+                if len(quick_wins) >= 3:
+                    break
+                if skill_data not in quick_wins:
+                    score = skill_data.get("priority_score", 0)
+                    if score > 70:  # High priority
+                        quick_wins.append({
+                            "skill": skill_data.get("skill", "Unknown"),
+                            "why_quick_win": "High priority skill with good ROI",
+                            "time_needed": f"{skill_data.get('duration_months', 1)}-{skill_data.get('duration_months', 1)+1} months",
+                            "impact": f"+{skill_data.get('score_improvement', 5):.0f}% match score",
+                            "difficulty": skill_data.get("difficulty", "moderate")
+                        })
+        
+        return quick_wins
     
     def _group_by_quarter(self, timeline: List[Dict]) -> Dict[str, List[Dict]]:
         """Group skills by quarter for visualization.

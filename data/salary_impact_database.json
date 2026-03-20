@@ -1,0 +1,452 @@
+{
+  "python": {
+    "average_boost_inr": 250000,
+    "salary_range": [400000, 2500000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "javascript": {
+    "average_boost_inr": 200000,
+    "salary_range": [350000, 2000000],
+    "demand": "very high",
+    "source": "Glassdoor_India_2024"
+  },
+  "react": {
+    "average_boost_inr": 280000,
+    "salary_range": [450000, 2200000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "angular": {
+    "average_boost_inr": 260000,
+    "salary_range": [400000, 2000000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "vue": {
+    "average_boost_inr": 220000,
+    "salary_range": [350000, 1800000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "node.js": {
+    "average_boost_inr": 280000,
+    "salary_range": [450000, 2200000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "java": {
+    "average_boost_inr": 280000,
+    "salary_range": [400000, 2500000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "spring boot": {
+    "average_boost_inr": 320000,
+    "salary_range": [500000, 2800000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "spring security": {
+    "average_boost_inr": 300000,
+    "salary_range": [550000, 2600000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "hibernate": {
+    "average_boost_inr": 250000,
+    "salary_range": [450000, 2000000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "csharp": {
+    "average_boost_inr": 280000,
+    "salary_range": [400000, 2200000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "asp.net": {
+    "average_boost_inr": 320000,
+    "salary_range": [500000, 2500000],
+    "demand": "high",
+    "source": "AmbitionBox_2024"
+  },
+  "ruby": {
+    "average_boost_inr": 240000,
+    "salary_range": [350000, 1800000],
+    "demand": "low",
+    "source": "Glassdoor_India_2024"
+  },
+  "ruby on rails": {
+    "average_boost_inr": 260000,
+    "salary_range": [400000, 1900000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "django": {
+    "average_boost_inr": 280000,
+    "salary_range": [450000, 2000000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "flask": {
+    "average_boost_inr": 240000,
+    "salary_range": [350000, 1600000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "fastapi": {
+    "average_boost_inr": 300000,
+    "salary_range": [500000, 2200000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "machine learning": {
+    "average_boost_inr": 600000,
+    "salary_range": [600000, 4500000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "tensorflow": {
+    "average_boost_inr": 550000,
+    "salary_range": [700000, 4000000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "pytorch": {
+    "average_boost_inr": 550000,
+    "salary_range": [700000, 4000000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "scikit-learn": {
+    "average_boost_inr": 350000,
+    "salary_range": [500000, 2500000],
+    "demand": "moderate",
+    "source": "Glassdoor_India_2024"
+  },
+  "deep learning": {
+    "average_boost_inr": 650000,
+    "salary_range": [800000, 4500000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "natural language processing": {
+    "average_boost_inr": 700000,
+    "salary_range": [900000, 5000000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "computer vision": {
+    "average_boost_inr": 680000,
+    "salary_range": [850000, 4800000],
+    "demand": "very high",
+    "source": "Indeed_India_2024"
+  },
+  "reinforcement learning": {
+    "average_boost_inr": 700000,
+    "salary_range": [900000, 5000000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "docker": {
+    "average_boost_inr": 350000,
+    "salary_range": [500000, 2300000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "kubernetes": {
+    "average_boost_inr": 450000,
+    "salary_range": [600000, 3000000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "terraform": {
+    "average_boost_inr": 400000,
+    "salary_range": [550000, 2800000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "ansible": {
+    "average_boost_inr": 300000,
+    "salary_range": [450000, 2000000],
+    "demand": "moderate",
+    "source": "Glassdoor_India_2024"
+  },
+  "jenkins": {
+    "average_boost_inr": 300000,
+    "salary_range": [450000, 1900000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "aws": {
+    "average_boost_inr": 500000,
+    "salary_range": [650000, 3500000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "google cloud platform": {
+    "average_boost_inr": 480000,
+    "salary_range": [600000, 3200000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "microsoft azure": {
+    "average_boost_inr": 450000,
+    "salary_range": [600000, 3000000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "devops": {
+    "average_boost_inr": 450000,
+    "salary_range": [600000, 3200000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "mlops": {
+    "average_boost_inr": 700000,
+    "salary_range": [800000, 4500000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "data analysis": {
+    "average_boost_inr": 400000,
+    "salary_range": [500000, 2500000],
+    "demand": "very high",
+    "source": "Indeed_India_2024"
+  },
+  "tableau": {
+    "average_boost_inr": 350000,
+    "salary_range": [450000, 2000000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "power bi": {
+    "average_boost_inr": 350000,
+    "salary_range": [450000, 2000000],
+    "demand": "high",
+    "source": "AmbitionBox_2024"
+  },
+  "sql": {
+    "average_boost_inr": 200000,
+    "salary_range": [400000, 1800000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "mysql": {
+    "average_boost_inr": 200000,
+    "salary_range": [400000, 1800000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "postgresql": {
+    "average_boost_inr": 220000,
+    "salary_range": [450000, 2000000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "mongodb": {
+    "average_boost_inr": 280000,
+    "salary_range": [500000, 2200000],
+    "demand": "high",
+    "source": "AmbitionBox_2024"
+  },
+  "redis": {
+    "average_boost_inr": 300000,
+    "salary_range": [550000, 2400000],
+    "demand": "moderate",
+    "source": "PayScale_India_2024"
+  },
+  "elasticsearch": {
+    "average_boost_inr": 350000,
+    "salary_range": [600000, 2800000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "apache spark": {
+    "average_boost_inr": 500000,
+    "salary_range": [700000, 3500000],
+    "demand": "very high",
+    "source": "Glassdoor_India_2024"
+  },
+  "hadoop": {
+    "average_boost_inr": 450000,
+    "salary_range": [600000, 3000000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "kafka": {
+    "average_boost_inr": 450000,
+    "salary_range": [700000, 3200000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "etl": {
+    "average_boost_inr": 400000,
+    "salary_range": [550000, 2600000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "go": {
+    "average_boost_inr": 350000,
+    "salary_range": [500000, 2500000],
+    "demand": "moderate",
+    "source": "Glassdoor_India_2024"
+  },
+  "rust": {
+    "average_boost_inr": 400000,
+    "salary_range": [600000, 2800000],
+    "demand": "low",
+    "source": "AmbitionBox_2024"
+  },
+  "git": {
+    "average_boost_inr": 100000,
+    "salary_range": [350000, 1500000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  },
+  "rest": {
+    "average_boost_inr": 200000,
+    "salary_range": [400000, 2000000],
+    "demand": "very high",
+    "source": "Indeed_India_2024"
+  },
+  "graphql": {
+    "average_boost_inr": 280000,
+    "salary_range": [500000, 2300000],
+    "demand": "moderate",
+    "source": "Glassdoor_India_2024"
+  },
+  "microservices": {
+    "average_boost_inr": 400000,
+    "salary_range": [650000, 3000000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "serverless": {
+    "average_boost_inr": 350000,
+    "salary_range": [550000, 2600000],
+    "demand": "moderate",
+    "source": "PayScale_India_2024"
+  },
+  "system design": {
+    "average_boost_inr": 500000,
+    "salary_range": [800000, 3500000],
+    "demand": "very high",
+    "source": "Indeed_India_2024"
+  },
+  "statistics": {
+    "average_boost_inr": 350000,
+    "salary_range": [500000, 2500000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "linear algebra": {
+    "average_boost_inr": 300000,
+    "salary_range": [500000, 2300000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "agile": {
+    "average_boost_inr": 150000,
+    "salary_range": [400000, 1800000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "scrum": {
+    "average_boost_inr": 150000,
+    "salary_range": [400000, 1800000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "security": {
+    "average_boost_inr": 500000,
+    "salary_range": [700000, 3500000],
+    "demand": "very high",
+    "source": "Glassdoor_India_2024"
+  },
+  "cryptography": {
+    "average_boost_inr": 500000,
+    "salary_range": [700000, 3200000],
+    "demand": "moderate",
+    "source": "AmbitionBox_2024"
+  },
+  "feature engineering": {
+    "average_boost_inr": 400000,
+    "salary_range": [600000, 2800000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "experiment tracking": {
+    "average_boost_inr": 300000,
+    "salary_range": [550000, 2200000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "model deployment": {
+    "average_boost_inr": 450000,
+    "salary_range": [650000, 3000000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "html": {
+    "average_boost_inr": 100000,
+    "salary_range": [300000, 1200000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "css": {
+    "average_boost_inr": 100000,
+    "salary_range": [300000, 1200000],
+    "demand": "high",
+    "source": "PayScale_India_2024"
+  },
+  "typescript": {
+    "average_boost_inr": 250000,
+    "salary_range": [450000, 2200000],
+    "demand": "high",
+    "source": "Indeed_India_2024"
+  },
+  "pandas": {
+    "average_boost_inr": 300000,
+    "salary_range": [500000, 2200000],
+    "demand": "high",
+    "source": "Glassdoor_India_2024"
+  },
+  "numpy": {
+    "average_boost_inr": 250000,
+    "salary_range": [450000, 2000000],
+    "demand": "high",
+    "source": "AmbitionBox_2024"
+  },
+  "matplotlib": {
+    "average_boost_inr": 150000,
+    "salary_range": [400000, 1600000],
+    "demand": "moderate",
+    "source": "PayScale_India_2024"
+  },
+  "seaborn": {
+    "average_boost_inr": 150000,
+    "salary_range": [400000, 1600000],
+    "demand": "moderate",
+    "source": "Indeed_India_2024"
+  },
+  "big data": {
+    "average_boost_inr": 600000,
+    "salary_range": [800000, 4500000],
+    "demand": "very high",
+    "source": "Glassdoor_India_2024"
+  },
+  "data engineering": {
+    "average_boost_inr": 550000,
+    "salary_range": [700000, 4000000],
+    "demand": "very high",
+    "source": "AmbitionBox_2024"
+  },
+  "prompt engineering": {
+    "average_boost_inr": 600000,
+    "salary_range": [850000, 3500000],
+    "demand": "very high",
+    "source": "PayScale_India_2024"
+  }
+}

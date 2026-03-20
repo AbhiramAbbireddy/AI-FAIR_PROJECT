@@ -1140,6 +1140,100 @@ COMPREHENSIVE_JOB_DATABASE = [
         "core_skills": ["technical support", "troubleshooting", "windows", "networking"],
         "optional_skills": ["active directory", "help desk", "ticketing", "hardware support"],
     },
+    # ─────────────────────────────────────────────────────────────────────────
+    # HUMAN RESOURCES & RECRUITMENT
+    # ─────────────────────────────────────────────────────────────────────────
+    {
+        "role": "HR Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["recruiting", "employee relations", "performance management", "compensation"],
+        "optional_skills": ["payroll", "benefits administration", "hr strategy", "organizational development", "change management"],
+    },
+    {
+        "role": "HR Business Partner",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["business partnering", "hr strategy", "employee relations", "stakeholder management"],
+        "optional_skills": ["organizational development", "talent management", "change management", "hr analytics"],
+    },
+    {
+        "role": "Recruiter",
+        "domain": "Human Resources",
+        "level": "Entry to Mid",
+        "core_skills": ["recruiting", "candidate sourcing", "job posting", "interview conduct"],
+        "optional_skills": ["hiring", "recruitment marketing", "applicant tracking", "networking"],
+    },
+    {
+        "role": "Talent Acquisition Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["recruiting", "talent acquisition", "candidate sourcing", "job posting"],
+        "optional_skills": ["recruitment marketing", "hiring", "employer branding", "recruiting strategy"],
+    },
+    {
+        "role": "HR Coordinator",
+        "domain": "Human Resources",
+        "level": "Entry",
+        "core_skills": ["administrative", "employee records", "scheduling", "communication"],
+        "optional_skills": ["benefits", "payroll", "training coordination", "scheduling"],
+    },
+    {
+        "role": "Compensation & Benefits Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["compensation", "benefits administration", "salary planning", "payroll"],
+        "optional_skills": ["equity compensation", "benefits design", "cost analysis", "compliance"],
+    },
+    {
+        "role": "Payroll Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["payroll", "payroll processing", "tax compliance", "statutory compliance"],
+        "optional_skills": ["benefits administration", "cost accounting", "hris", "audit"],
+    },
+    {
+        "role": "Training & Development Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["training and development", "training design", "coaching", "learning management"],
+        "optional_skills": ["instructional design", "e-learning", "mentoring", "corporate training"],
+    },
+    {
+        "role": "L&D Specialist",
+        "domain": "Human Resources",
+        "level": "Entry to Mid",
+        "core_skills": ["training and development", "training design", "corporate training", "learning management"],
+        "optional_skills": ["instructional design", "e-learning", "coaching", "content development"],
+    },
+    {
+        "role": "Employee Relations Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["employee relations", "conflict resolution", "grievance handling", "labor law"],
+        "optional_skills": ["employee engagement", "performance management", "compliance", "mediation"],
+    },
+    {
+        "role": "Organizational Development Manager",
+        "domain": "Human Resources",
+        "level": "Mid to Senior",
+        "core_skills": ["organizational development", "change management", "culture building", "strategic planning"],
+        "optional_skills": ["team development", "coaching", "hr strategy", "talent management"],
+    },
+    {
+        "role": "HR Analyst",
+        "domain": "Human Resources",
+        "level": "Entry to Mid",
+        "core_skills": ["hr analytics", "data analysis", "excel", "reporting"],
+        "optional_skills": ["business intelligence", "metrics", "dashboards", "hris", "sql"],
+    },
+    {
+        "role": "HRIS Administrator",
+        "domain": "Human Resources",
+        "level": "Entry to Mid",
+        "core_skills": ["hris", "data management", "technical support", "employee records"],
+        "optional_skills": ["system administration", "training", "troubleshooting", "documentation"],
+    },
 ]
 
 # Backward compatibility for existing imports in matcher/app code.

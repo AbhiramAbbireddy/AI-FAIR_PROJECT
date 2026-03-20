@@ -1,345 +1,289 @@
 """
-Skill Priority Ranker - Ranks missing skills using multi-factor scoring.
+Canonical priority ranking component for FAIR-PATH.
 
-This module scores skills based on:
-1. Job Importance (40%)
-2. Market Demand (30%)
-3. Learning Ease (20%)
-4. Salary Impact (10%)
+Ranks missing skills using the weighted framework from the project design:
+- Job Importance: 40%
+- Market Demand: 30%
+- Learning Ease: 20%
+- Salary Impact: 10%
 """
+from __future__ import annotations
 
 import json
-import os
-from typing import Dict, List
-import logging
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
-logger = logging.getLogger(__name__)
+from src.config.settings import BASE_DIR
+
+
+@dataclass(slots=True)
+class PriorityRankerConfig:
+    job_importance_weight: float = 0.40
+    market_demand_weight: float = 0.30
+    learning_ease_weight: float = 0.20
+    salary_impact_weight: float = 0.10
+    learning_db_path: Path = BASE_DIR / "data" / "learning_time_database.json"
+    salary_db_path: Path = BASE_DIR / "data" / "salary_impact_database.json"
 
 
 class PriorityRanker:
-    """Ranks missing skills by learning priority using weighted factors."""
-    
-    def __init__(self, trend_data: Dict = None, learning_db_path: str = "data/learning_time_database.json",
-                 salary_db_path: str = "data/salary_impact_database.json"):
-        """Initialize ranker with trend and database data.
-        
-        Args:
-            trend_data: Dict with trend information {skill: {growth_rate, trend}}
-            learning_db_path: Path to learning time database
-            salary_db_path: Path to salary impact database
-        """
-        self.trend_data = trend_data or {}
-        self.learning_time_db = self._load_json(learning_db_path)
-        self.salary_db = self._load_json(salary_db_path)
-        
-        # Weighted factors (must sum to 1.0)
-        self.weights = {
-            "job_importance": 0.40,
-            "market_demand": 0.30,
-            "learning_ease": 0.20,
-            "salary_impact": 0.10
-        }
-        
-        self.logger = logger
-    
-    def _load_json(self, filepath: str) -> dict:
-        """Load JSON database file."""
+    """Ranks missing skills by practical learning priority."""
+
+    def __init__(
+        self,
+        trend_data: dict[str, dict[str, Any]] | list[dict[str, Any]] | None = None,
+        config: PriorityRankerConfig | None = None,
+    ):
+        self.config = config or PriorityRankerConfig()
+        self.learning_time_db = self._load_json(self.config.learning_db_path)
+        self.salary_db = self._load_json(self.config.salary_db_path)
+        self.trend_data = self._normalize_trend_data(trend_data)
+
+    @staticmethod
+    def _load_json(path: Path) -> dict[str, Any]:
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            self.logger.warning(f"File {filepath} not found")
+            with open(path, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
             return {}
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Error parsing {filepath}: {e}")
+
+    @staticmethod
+    def _normalize_skill(skill: str) -> str:
+        return skill.strip().lower()
+
+    def _normalize_trend_data(
+        self,
+        trend_data: dict[str, dict[str, Any]] | list[dict[str, Any]] | None,
+    ) -> dict[str, dict[str, Any]]:
+        if not trend_data:
             return {}
-    
-    def calculate_job_importance(self, skill: str, job_description: str,
-                                category: str, mention_count: int = 1) -> float:
-        """Score job-specific importance (0-100).
-        
-        Logic:
-        - CRITICAL category → 90-100
-        - IMPORTANT category → 60-89
-        - NICE_TO_HAVE → 30-59
-        - Add bonus for mention count
-        
-        Args:
-            skill: Skill to score
-            job_description: Job description text
-            category: Gap category (CRITICAL/IMPORTANT/NICE_TO_HAVE)
-            mention_count: How many times skill mentioned in description
-            
-        Returns:
-            Score 0-100
-        """
-        base_scores = {
-            "CRITICAL": 95,
-            "IMPORTANT": 75,
-            "NICE_TO_HAVE": 40
-        }
-        
-        base = base_scores.get(category, 50)
-        
-        # Bonus for multiple mentions (max 20 points)
-        mention_bonus = min(mention_count * 5, 20)
-        
-        # Bonus if in job description (5 points)
-        desc_bonus = 5 if job_description and skill.lower() in job_description.lower() else 0
-        
-        return min(base + mention_bonus + desc_bonus, 100)
-    
-    def calculate_market_demand(self, skill: str) -> float:
-        """Score market demand based on trends (0-100).
-        
-        Growth rate interpretation:
-        - >20% growth → 90-100 (very high demand)
-        - 5-20% growth → 60-89 (high demand)
-        - 0-5% growth → 40-59 (medium demand)
-        - <0% growth → 10-39 (declining)
-        
-        Args:
-            skill: Skill to evaluate
-            
-        Returns:
-            Score 0-100
-        """
-        # Check trend data first
-        if skill.lower() in self.trend_data:
-            growth = self.trend_data[skill.lower()].get("growth_rate", 0)
-            
-            if growth > 20:
-                return 95
-            elif growth > 5:
-                return 75
-            elif growth > 0:
-                return 50
-            else:
-                return 25
-        
-        # Check salary data for demand indicator
-        if skill.lower() in self.salary_db:
-            demand_map = {
-                "very high": 95,
-                "high": 75,
-                "moderate": 55,
-                "low": 25
+
+        normalized: dict[str, dict[str, Any]] = {}
+        if isinstance(trend_data, dict):
+            for skill, payload in trend_data.items():
+                normalized[self._normalize_skill(skill)] = {
+                    "growth_rate": float(payload.get("growth_rate", payload.get("growth_pct", 0.0))),
+                    "trend": str(payload.get("trend", payload.get("forecast_demand", "Unknown"))),
+                    "current_pct": float(payload.get("current_pct", 0.0)),
+                }
+            return normalized
+
+        for item in trend_data:
+            skill = str(item.get("skill", "")).strip()
+            if not skill:
+                continue
+            normalized[self._normalize_skill(skill)] = {
+                "growth_rate": float(item.get("growth_rate", item.get("growth_pct", 0.0))),
+                "trend": str(item.get("trend", item.get("forecast_demand", "Unknown"))),
+                "current_pct": float(item.get("current_pct", 0.0)),
             }
-            demand = self.salary_db[skill.lower()].get("demand", "moderate")
-            return demand_map.get(demand, 50)
-        
-        # Default if no data
-        return 50
-    
+        return normalized
+
+    def update_trend_data(self, trend_data: dict[str, dict[str, Any]] | list[dict[str, Any]] | None) -> None:
+        self.trend_data = self._normalize_trend_data(trend_data)
+
+    def calculate_job_importance(
+        self,
+        skill: str,
+        job_description: str,
+        category: str,
+        mention_count: int | None = None,
+    ) -> float:
+        normalized_category = category.upper()
+        base_scores = {
+            "CRITICAL": 95.0,
+            "IMPORTANT": 75.0,
+            "NICE_TO_HAVE": 40.0,
+        }
+        base_score = base_scores.get(normalized_category, 55.0)
+        mentions = mention_count if mention_count is not None else self.count_skill_mentions(skill, job_description)
+        mention_bonus = min(mentions * 5.0, 20.0)
+
+        text = job_description.lower()
+        skill_lower = self._normalize_skill(skill)
+        keyword_bonus = 0.0
+        if skill_lower in text:
+            keyword_bonus += 5.0
+        if any(token in text for token in ["required", "must have", "essential", "mandatory"]) and skill_lower in text:
+            keyword_bonus += 5.0
+
+        return round(min(base_score + mention_bonus + keyword_bonus, 100.0), 2)
+
+    def calculate_market_demand(self, skill: str) -> float:
+        payload = self.trend_data.get(self._normalize_skill(skill))
+        if payload:
+            growth = float(payload.get("growth_rate", 0.0))
+            current_pct = float(payload.get("current_pct", 0.0))
+            if growth >= 30:
+                return 95.0
+            if growth >= 15:
+                return 85.0
+            if growth >= 5:
+                return 70.0
+            if growth >= -5:
+                return 55.0 + min(current_pct, 20.0) * 0.5
+            return 25.0
+
+        salary_payload = self.salary_db.get(self._normalize_skill(skill), {})
+        demand_label = str(salary_payload.get("demand", "moderate")).lower()
+        demand_map = {
+            "very high": 90.0,
+            "high": 75.0,
+            "moderate": 55.0,
+            "low": 30.0,
+        }
+        return demand_map.get(demand_label, 50.0)
+
     def calculate_learning_ease(self, skill: str) -> float:
-        """Score learning difficulty - inverse of time needed (0-100).
-        
-        Time to learn mapping:
-        - 1-2 months → 90-100 (very easy)
-        - 3-4 months → 70-89 (easy)
-        - 5-6 months → 50-69 (moderate)
-        - 7-12 months → 30-49 (hard)
-        - 12+ months → 10-29 (very hard)
-        
-        Args:
-            skill: Skill to evaluate
-            
-        Returns:
-            Score 0-100
-        """
-        if skill.lower() not in self.learning_time_db:
-            return 50  # Default if no data
-        
-        months = self.learning_time_db[skill.lower()].get("months_to_learn", 6)
-        
+        payload = self.learning_time_db.get(self._normalize_skill(skill), {})
+        months = float(payload.get("months_to_learn", 6))
         if months <= 2:
-            return 95
-        elif months <= 4:
-            return 80
-        elif months <= 6:
-            return 60
-        elif months <= 12:
-            return 40
-        else:
-            return 20
-    
+            return 95.0
+        if months <= 4:
+            return 80.0
+        if months <= 6:
+            return 60.0
+        if months <= 12:
+            return 40.0
+        return 20.0
+
     def calculate_salary_impact(self, skill: str) -> float:
-        """Score salary potential (0-100).
-        
-        Salary boost mapping (INR):
-        - >5L boost → 90-100
-        - 2-5L boost → 60-89
-        - <2L boost → 30-59
-        
-        Args:
-            skill: Skill to evaluate
-            
-        Returns:
-            Score 0-100
-        """
-        if skill.lower() not in self.salary_db:
-            return 50  # Default
-        
-        salary_boost = self.salary_db[skill.lower()].get("average_boost_inr", 250000)
-        
-        if salary_boost > 500000:  # >5L
-            return 95
-        elif salary_boost > 200000:  # >2L
-            return 75
-        else:
-            return 40
-    
-    def calculate_priority_score(self, skill: str, job_description: str = "",
-                               category: str = "IMPORTANT",
-                               mention_count: int = 1) -> Dict:
-        """Calculate weighted priority score.
-        
-        Formula:
-        Priority = (JobImportance × 0.4) + (MarketDemand × 0.3) +
-                   (LearningEase × 0.2) + (SalaryImpact × 0.1)
-        
-        Args:
-            skill: Skill to score
-            job_description: Job description text
-            category: Gap category
-            mention_count: Mention frequency
-            
-        Returns:
-            Dict with priority_score and breakdown
-        """
+        payload = self.salary_db.get(self._normalize_skill(skill), {})
+        salary_boost = float(payload.get("average_boost_inr", 250000))
+        if salary_boost >= 500000:
+            return 95.0
+        if salary_boost >= 300000:
+            return 80.0
+        if salary_boost >= 200000:
+            return 65.0
+        return 40.0
+
+    @staticmethod
+    def count_skill_mentions(skill: str, job_description: str) -> int:
+        if not skill or not job_description:
+            return 0
+        pattern = r"\b" + re.escape(skill) + r"\b"
+        return len(re.findall(pattern, job_description, flags=re.IGNORECASE))
+
+    def calculate_priority_score(
+        self,
+        skill: str,
+        *,
+        job_description: str = "",
+        category: str = "IMPORTANT",
+        mention_count: int | None = None,
+    ) -> dict[str, Any]:
         scores = {
             "job_importance": self.calculate_job_importance(skill, job_description, category, mention_count),
             "market_demand": self.calculate_market_demand(skill),
             "learning_ease": self.calculate_learning_ease(skill),
-            "salary_impact": self.calculate_salary_impact(skill)
+            "salary_impact": self.calculate_salary_impact(skill),
         }
-        
-        # Calculate weighted score
-        priority_score = sum(
-            scores[factor] * self.weights[factor]
-            for factor in scores
+
+        priority_score = (
+            scores["job_importance"] * self.config.job_importance_weight
+            + scores["market_demand"] * self.config.market_demand_weight
+            + scores["learning_ease"] * self.config.learning_ease_weight
+            + scores["salary_impact"] * self.config.salary_impact_weight
         )
-        
-        # Get learning time for context
-        learning_months = self.learning_time_db.get(skill.lower(), {}).get("months_to_learn", "Unknown")
-        
-        # Get salary impact for context
-        salary_boost = self.salary_db.get(skill.lower(), {}).get("average_boost_inr", "N/A")
-        
+
+        normalized_skill = self._normalize_skill(skill)
+        learning_time = self.learning_time_db.get(normalized_skill, {}).get("months_to_learn", "Unknown")
+        salary_boost = self.salary_db.get(normalized_skill, {}).get("average_boost_inr", "N/A")
+
         return {
-            "skill": skill,
+            "skill": normalized_skill,
             "priority_score": round(priority_score, 2),
             "rank_tier": self._rank_to_tier(priority_score),
-            "breakdown": scores,
-            "category": category,
-            "learning_time_months": learning_months,
+            "breakdown": {key: round(float(value), 2) for key, value in scores.items()},
+            "category": category.upper(),
+            "learning_time_months": learning_time,
             "salary_boost_inr": salary_boost,
-            "recommendation": self._generate_recommendation(priority_score, scores)
+            "market_context": self.trend_data.get(normalized_skill, {}),
+            "recommendation": self._generate_recommendation(priority_score, scores),
         }
-    
-    def _rank_to_tier(self, score: float) -> str:
-        """Convert score to human-readable tier.
-        
-        Args:
-            score: Priority score (0-100)
-            
-        Returns:
-            Tier: "CRITICAL", "HIGH", "MEDIUM", or "LOW"
-        """
+
+    @staticmethod
+    def _rank_to_tier(score: float) -> str:
         if score >= 85:
             return "CRITICAL"
-        elif score >= 70:
+        if score >= 70:
             return "HIGH"
-        elif score >= 50:
+        if score >= 50:
             return "MEDIUM"
-        else:
-            return "LOW"
-    
-    def _generate_recommendation(self, priority_score: float, scores: Dict) -> str:
-        """Generate actionable recommendation based on scores.
-        
-        Args:
-            priority_score: Overall priority score
-            scores: Dictionary of factor scores
-            
-        Returns:
-            Recommendation string
-        """
+        return "LOW"
+
+    def _generate_recommendation(self, priority_score: float, scores: dict[str, float]) -> str:
         tier = self._rank_to_tier(priority_score)
-        
         if tier == "CRITICAL":
-            if scores["learning_ease"] > 80:
-                return "URGENT: Quick win! Learn this skill immediately - high priority and relatively easy."
-            else:
-                return "URGENT: High priority despite learning difficulty. Start learning now."
-        
-        elif tier == "HIGH":
-            if scores["salary_impact"] > 80:
-                return "Prioritize this skill - significant salary boost potential."
-            elif scores["market_demand"] > 80:
-                return "Market-hot skill! Good career move to learn this soon."
-            else:
-                return "Important for this role. Learn within next 2-3 months."
-        
-        elif tier == "MEDIUM":
-            if scores["learning_ease"] > 80:
-                return "Good skill to have. Can be learned quickly if time permits."
-            else:
-                return "Useful but not urgent. Plan to learn within 6 months."
-        
-        else:
-            return "Lower priority. Learn only if you have spare time."
-    
-    def rank_all_gaps(self, categorized_gaps: Dict[str, List[str]],
-                     job_description: str = "") -> List[Dict]:
-        """Rank all identified gaps.
-        
-        Args:
-            categorized_gaps: Dict from gap_categorizer (critical/important/nice_to_have)
-            job_description: Full job description text
-            
-        Returns:
-            List of ranked skill dicts, sorted by priority score (descending)
-        """
-        all_ranked = []
-        
+            if scores["learning_ease"] >= 80:
+                return "Learn this first. It is both high-impact and relatively quick to pick up."
+            return "Start this early. It is strategically important even if it takes longer."
+        if tier == "HIGH":
+            if scores["market_demand"] >= 80:
+                return "Strong market signal. Schedule this in the next learning cycle."
+            return "Important for the target role. Plan this soon after the top priority skill."
+        if tier == "MEDIUM":
+            return "Useful supporting skill. Add it after the core blockers are covered."
+        return "Lower urgency. Learn it later or only if your target role keeps requiring it."
+
+    def rank_all_gaps(
+        self,
+        categorized_gaps: dict[str, list[str]],
+        job_description: str = "",
+    ) -> list[dict[str, Any]]:
+        ranked: list[dict[str, Any]] = []
         for category, skills in categorized_gaps.items():
             for skill in skills:
-                ranked_skill = self.calculate_priority_score(
-                    skill,
-                    job_description,
-                    category.upper()
+                ranked.append(
+                    self.calculate_priority_score(
+                        skill,
+                        job_description=job_description,
+                        category=category.upper(),
+                        mention_count=self.count_skill_mentions(skill, job_description),
+                    )
                 )
-                all_ranked.append(ranked_skill)
-        
-        # Sort by priority score (descending)
-        all_ranked.sort(key=lambda x: x["priority_score"], reverse=True)
-        
-        return all_ranked
-    
-    def get_ranking_summary(self, ranked_skills: List[Dict]) -> str:
-        """Generate readable ranking summary.
-        
-        Args:
-            ranked_skills: List of ranked skill dicts
-            
-        Returns:
-            Summary string
-        """
-        top_5 = ranked_skills[:5]
-        
-        summary = """
-        Priority Ranking Summary (Top 5)
-        ===============================
-        """
-        
-        for i, skill_data in enumerate(top_5, 1):
-            summary += f"""
-        {i}. {skill_data['skill'].upper()} - Priority Score: {skill_data['priority_score']}/100
-           Category: {skill_data['category']}
-           Learning Time: {skill_data['learning_time_months']} months
-           Salary Boost: ₹{skill_data['salary_boost_inr']} (approx)
-           → {skill_data['recommendation']}
-        """
-        
-        return summary
+        ranked.sort(key=lambda item: item["priority_score"], reverse=True)
+        return ranked
+
+    def rank_missing_skills_for_job(
+        self,
+        *,
+        missing_skills: list[str],
+        job_description: str = "",
+        required_skills: list[str] | None = None,
+        optional_skills: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        required_set = {self._normalize_skill(skill) for skill in (required_skills or [])}
+        optional_set = {self._normalize_skill(skill) for skill in (optional_skills or [])}
+
+        categorized: dict[str, list[str]] = {
+            "critical": [],
+            "important": [],
+            "nice_to_have": [],
+        }
+        for skill in missing_skills:
+            normalized = self._normalize_skill(skill)
+            if normalized in required_set:
+                categorized["critical"].append(normalized)
+            elif normalized in optional_set:
+                categorized["nice_to_have"].append(normalized)
+            else:
+                categorized["important"].append(normalized)
+        return self.rank_all_gaps(categorized, job_description)
+
+    def get_ranking_summary(self, ranked_skills: list[dict[str, Any]]) -> str:
+        lines = ["Priority Ranking Summary", "========================"]
+        for index, skill_data in enumerate(ranked_skills[:5], 1):
+            lines.append(
+                f"{index}. {skill_data['skill']} - {skill_data['priority_score']}/100 "
+                f"({skill_data['rank_tier']})"
+            )
+            lines.append(
+                f"   Learn in: {skill_data['learning_time_months']} months | "
+                f"Salary boost: ₹{skill_data['salary_boost_inr']}"
+            )
+            lines.append(f"   {skill_data['recommendation']}")
+        return "\n".join(lines)

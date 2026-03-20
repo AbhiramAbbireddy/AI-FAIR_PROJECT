@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from src.role_mapping.role_database import ROLE_DATABASE
+from src.job_roles_database import load_job_roles
 
 
 @dataclass
@@ -40,9 +40,9 @@ def match_roles(
     resume_set = {s.lower().strip() for s in resume_skills}
 
     results: list[RoleMatch] = []
-    for entry in ROLE_DATABASE:
-        core = [s.lower() for s in entry["core_skills"]]
-        optional = [s.lower() for s in entry.get("optional_skills", [])]
+    for entry in load_job_roles():
+        core = list(entry.core_skills)
+        optional = list(entry.optional_skills)
 
         matched_core = [s for s in core if s in resume_set]
         matched_opt = [s for s in optional if s in resume_set]
@@ -61,9 +61,9 @@ def match_roles(
 
         results.append(
             RoleMatch(
-                role=entry["role"],
-                domain=entry["domain"],
-                description=entry.get("description", ""),
+                role=entry.role,
+                domain=entry.domain,
+                description=entry.description,
                 score=round(score, 1),
                 core_match_pct=round(core_pct * 100, 1),
                 matched_core=matched_core,

@@ -11,13 +11,12 @@ import pandas as pd
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 
 from src.config.settings import JOBS_PARSED_PATH
+from src.job_matcher import jobs_df_to_postings, match_resume_to_jobs
 from src.job_pipeline.collector import JobCollector, load_static_jobs
-from src.matching.semantic_matcher import (
-    jobs_df_to_postings,
-    match_resume_to_jobs,
-)
 from src.models.schemas import MatchResult
-from src.skill_extraction.extractor import extract_skill_names, extract_text
+from src.resume_parser import parse_resume
+from src.shap_explainer import MatchSHAPExplainer
+from src.skill_extractor import extract_skill_names
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -47,13 +46,63 @@ async def match_jobs(
         tmp_path = tmp.name
 
     try:
-        text = extract_text(tmp_path, filename=file.filename or "")
-        skills = extract_skill_names(text, use_ner=True)
+        parsed_resume = parse_resume(tmp_path, filename=file.filename or "")
+        skills = extract_skill_names(parsed_resume.text, use_ner=True)
         postings = _get_postings()
         if remote_only:
             postings = [p for p in postings if p.remote]
-        results = match_resume_to_jobs(text, skills, postings, top_n=top_n, min_score=min_score)
+        results = match_resume_to_jobs(
+            parsed_resume.text,
+            skills,
+            postings,
+            top_n=top_n,
+            min_score=min_score,
+        )
         return results
+    finally:
+        os.unlink(tmp_path)
+
+
+@router.post("/explain")
+async def explain_job_match(
+    file: UploadFile = File(...),
+    job_id: str = Form(...),
+):
+    """Upload resume + job id â†’ return canonical SHAP explanation for that match."""
+    ext = os.path.splitext(file.filename or "")[-1].lower()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext or ".pdf") as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    try:
+        parsed_resume = parse_resume(tmp_path, filename=file.filename or "")
+        skills = extract_skill_names(parsed_resume.text, use_ner=True)
+        postings = _get_postings()
+        target_posting = next((posting for posting in postings if posting.job_id == job_id), None)
+        if target_posting is None:
+            raise HTTPException(status_code=404, detail=f"Job id '{job_id}' not found.")
+
+        match = match_resume_to_jobs(
+            parsed_resume.text,
+            skills,
+            [target_posting],
+            top_n=1,
+            min_score=0,
+            use_semantic=False,
+        )
+        match_result = match[0] if match else None
+        if match_result is None:
+            raise HTTPException(status_code=400, detail="Unable to score the requested job.")
+
+        explainer = MatchSHAPExplainer()
+        explanation = explainer.explain_job_matches(
+            parsed_resume.text,
+            skills,
+            [match_result],
+            postings,
+        )
+        return explanation.get(job_id, {})
     finally:
         os.unlink(tmp_path)
 

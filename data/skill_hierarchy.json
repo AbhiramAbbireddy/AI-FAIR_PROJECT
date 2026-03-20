@@ -1,0 +1,446 @@
+{
+  "react": {
+    "implies": ["javascript", "html", "css", "npm", "webpack"],
+    "category": "frontend",
+    "level": "intermediate",
+    "parent": "javascript"
+  },
+  "angular": {
+    "implies": ["javascript", "typescript", "html", "css", "rxjs"],
+    "category": "frontend",
+    "level": "intermediate",
+    "parent": "typescript"
+  },
+  "vue": {
+    "implies": ["javascript", "html", "css", "npm"],
+    "category": "frontend",
+    "level": "intermediate",
+    "parent": "javascript"
+  },
+  "node.js": {
+    "implies": ["javascript"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "javascript"
+  },
+  "django": {
+    "implies": ["python"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "python"
+  },
+  "flask": {
+    "implies": ["python"],
+    "category": "backend",
+    "level": "beginner",
+    "parent": "python"
+  },
+  "fastapi": {
+    "implies": ["python"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "python"
+  },
+  "spring boot": {
+    "implies": ["java", "maven", "sql"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "java"
+  },
+  "spring security": {
+    "implies": ["spring boot", "java", "authentication", "oauth"],
+    "category": "backend",
+    "level": "advanced",
+    "parent": "spring boot"
+  },
+  "hibernate": {
+    "implies": ["java", "sql", "jpa"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "java"
+  },
+  "asp.net": {
+    "implies": ["csharp", "dotnet", "sql"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "csharp"
+  },
+  "ruby on rails": {
+    "implies": ["ruby", "sql", "html", "css"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "ruby"
+  },
+  "tensorflow": {
+    "implies": ["python", "machine learning", "numpy", "pandas"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "pytorch": {
+    "implies": ["python", "machine learning", "numpy"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "scikit-learn": {
+    "implies": ["python", "machine learning", "pandas", "numpy"],
+    "category": "ai/ml",
+    "level": "intermediate",
+    "parent": "machine learning"
+  },
+  "machine learning": {
+    "implies": ["python", "statistics", "linear algebra", "data analysis"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "python"
+  },
+  "deep learning": {
+    "implies": ["machine learning", "tensorflow", "pytorch", "numpy"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "natural language processing": {
+    "implies": ["python", "machine learning", "deep learning"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "computer vision": {
+    "implies": ["python", "machine learning", "deep learning", "opencv"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "reinforcement learning": {
+    "implies": ["python", "machine learning", "mathematics"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "docker": {
+    "implies": ["linux basics", "cli"],
+    "category": "devops",
+    "level": "intermediate",
+    "parent": "devops"
+  },
+  "kubernetes": {
+    "implies": ["docker", "devops", "yaml", "cli"],
+    "category": "devops",
+    "level": "advanced",
+    "parent": "docker"
+  },
+  "terraform": {
+    "implies": ["devops", "cloud platforms", "yaml"],
+    "category": "devops",
+    "level": "intermediate",
+    "parent": "devops"
+  },
+  "ansible": {
+    "implies": ["devops", "yaml", "linux basics"],
+    "category": "devops",
+    "level": "intermediate",
+    "parent": "devops"
+  },
+  "jenkins": {
+    "implies": ["ci/cd", "devops", "groovy"],
+    "category": "devops",
+    "level": "intermediate",
+    "parent": "ci/cd"
+  },
+  "github actions": {
+    "implies": ["git", "ci/cd"],
+    "category": "devops",
+    "level": "beginner",
+    "parent": "ci/cd"
+  },
+  "apache spark": {
+    "implies": ["big data", "scala", "distributed computing"],
+    "category": "data engineering",
+    "level": "advanced",
+    "parent": "big data"
+  },
+  "hadoop": {
+    "implies": ["big data", "mapreduce", "hdfs"],
+    "category": "data engineering",
+    "level": "advanced",
+    "parent": "big data"
+  },
+  "kafka": {
+    "implies": ["event streaming", "distributed systems"],
+    "category": "data engineering",
+    "level": "intermediate",
+    "parent": "event streaming"
+  },
+  "etl": {
+    "implies": ["sql", "data engineering", "database design"],
+    "category": "data engineering",
+    "level": "intermediate",
+    "parent": "data engineering"
+  },
+  "aws": {
+    "implies": ["cloud platforms", "devops"],
+    "category": "cloud",
+    "level": "intermediate",
+    "parent": "cloud platforms"
+  },
+  "amazon web services": {
+    "implies": ["cloud platforms", "devops"],
+    "category": "cloud",
+    "level": "intermediate",
+    "parent": "cloud platforms"
+  },
+  "google cloud platform": {
+    "implies": ["cloud platforms", "devops"],
+    "category": "cloud",
+    "level": "intermediate",
+    "parent": "cloud platforms"
+  },
+  "microsoft azure": {
+    "implies": ["cloud platforms", "devops", "dotnet"],
+    "category": "cloud",
+    "level": "intermediate",
+    "parent": "cloud platforms"
+  },
+  "rest": {
+    "implies": ["api design", "http"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "api design"
+  },
+  "graphql": {
+    "implies": ["api design", "query languages"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "api design"
+  },
+  "microservices": {
+    "implies": ["system design", "docker", "distributed systems"],
+    "category": "architecture",
+    "level": "advanced",
+    "parent": "system design"
+  },
+  "serverless": {
+    "implies": ["cloud platforms", "aws lambda"],
+    "category": "architecture",
+    "level": "intermediate",
+    "parent": "cloud platforms"
+  },
+  "mysql": {
+    "implies": ["sql", "relational databases"],
+    "category": "database",
+    "level": "intermediate",
+    "parent": "relational databases"
+  },
+  "postgresql": {
+    "implies": ["sql", "relational databases"],
+    "category": "database",
+    "level": "intermediate",
+    "parent": "relational databases"
+  },
+  "mongodb": {
+    "implies": ["nosql", "json"],
+    "category": "database",
+    "level": "intermediate",
+    "parent": "nosql"
+  },
+  "redis": {
+    "implies": ["caching", "data structures"],
+    "category": "database",
+    "level": "intermediate",
+    "parent": "caching"
+  },
+  "elasticsearch": {
+    "implies": ["search", "data indexing"],
+    "category": "database",
+    "level": "advanced",
+    "parent": "search"
+  },
+  "pandas": {
+    "implies": ["python", "data analysis", "numpy"],
+    "category": "data",
+    "level": "intermediate",
+    "parent": "python"
+  },
+  "numpy": {
+    "implies": ["python", "mathematics"],
+    "category": "data",
+    "level": "intermediate",
+    "parent": "python"
+  },
+  "matplotlib": {
+    "implies": ["python", "data visualization"],
+    "category": "data",
+    "level": "beginner",
+    "parent": "data visualization"
+  },
+  "seaborn": {
+    "implies": ["python", "matplotlib", "data visualization"],
+    "category": "data",
+    "level": "intermediate",
+    "parent": "data visualization"
+  },
+  "data analysis": {
+    "implies": ["python", "statistics", "sql"],
+    "category": "data",
+    "level": "intermediate",
+    "parent": "statistics"
+  },
+  "tableau": {
+    "implies": ["data visualization", "sql"],
+    "category": "analytics",
+    "level": "intermediate",
+    "parent": "data visualization"
+  },
+  "power bi": {
+    "implies": ["data visualization", "sql", "dax"],
+    "category": "analytics",
+    "level": "intermediate",
+    "parent": "data visualization"
+  },
+  "git": {
+    "implies": ["version control", "cli"],
+    "category": "development",
+    "level": "intermediate",
+    "parent": "version control"
+  },
+  "typescript": {
+    "implies": ["javascript"],
+    "category": "frontend",
+    "level": "intermediate",
+    "parent": "javascript"
+  },
+  "html": {
+    "implies": ["web development"],
+    "category": "frontend",
+    "level": "beginner",
+    "parent": "web development"
+  },
+  "css": {
+    "implies": ["html", "web development"],
+    "category": "frontend",
+    "level": "beginner",
+    "parent": "web development"
+  },
+  "java": {
+    "implies": ["oop", "algorithms"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "programming"
+  },
+  "python": {
+    "implies": ["algorithms", "data structures"],
+    "category": "general",
+    "level": "beginner",
+    "parent": "programming"
+  },
+  "csharp": {
+    "implies": ["oop", "dotnet"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "programming"
+  },
+  "golang": {
+    "implies": ["concurrency", "systems programming"],
+    "category": "backend",
+    "level": "intermediate",
+    "parent": "programming"
+  },
+  "rust": {
+    "implies": ["memory safety", "systems programming"],
+    "category": "systems",
+    "level": "advanced",
+    "parent": "programming"
+  },
+  "system design": {
+    "implies": ["object-oriented design", "scalability", "distributed systems"],
+    "category": "architecture",
+    "level": "advanced",
+    "parent": "software architecture"
+  },
+  "devops": {
+    "implies": ["linux basics", "bash", "network basics"],
+    "category": "infrastructure",
+    "level": "intermediate",
+    "parent": "infrastructure"
+  },
+  "big data": {
+    "implies": ["distributed computing", "sql", "data engineering"],
+    "category": "data engineering",
+    "level": "advanced",
+    "parent": "data engineering"
+  },
+  "statistics": {
+    "implies": ["mathematics"],
+    "category": "math",
+    "level": "intermediate",
+    "parent": "mathematics"
+  },
+  "linear algebra": {
+    "implies": ["mathematics"],
+    "category": "math",
+    "level": "intermediate",
+    "parent": "mathematics"
+  },
+  "api design": {
+    "implies": ["http", "system design"],
+    "category": "backend",
+    "level": "advanced",
+    "parent": "system design"
+  },
+  "database design": {
+    "implies": ["sql", "normalization"],
+    "category": "database",
+    "level": "advanced",
+    "parent": "databases"
+  },
+  "security": {
+    "implies": ["cryptography", "network basics"],
+    "category": "infrastructure",
+    "level": "advanced",
+    "parent": "infrastructure"
+  },
+  "agile": {
+    "implies": ["project management"],
+    "category": "methodology",
+    "level": "intermediate",
+    "parent": "leadership"
+  },
+  "scrum": {
+    "implies": ["agile", "project management"],
+    "category": "methodology",
+    "level": "beginner",
+    "parent": "agile"
+  },
+  "mlops": {
+    "implies": ["devops", "machine learning", "docker", "monitoring"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "machine learning"
+  },
+  "feature engineering": {
+    "implies": ["machine learning", "data analysis"],
+    "category": "ai/ml",
+    "level": "intermediate",
+    "parent": "machine learning"
+  },
+  "experiment tracking": {
+    "implies": ["machine learning", "mlops"],
+    "category": "ai/ml",
+    "level": "intermediate",
+    "parent": "mlops"
+  },
+  "model deployment": {
+    "implies": ["mlops", "docker", "devops"],
+    "category": "ai/ml",
+    "level": "advanced",
+    "parent": "mlops"
+  },
+  "prompt engineering": {
+    "implies": ["natural language processing", "llm"],
+    "category": "ai/ml",
+    "level": "intermediate",
+    "parent": "natural language processing"
+  }
+}

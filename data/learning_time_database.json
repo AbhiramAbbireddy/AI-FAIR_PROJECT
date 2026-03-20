@@ -1,0 +1,488 @@
+{
+  "javascript": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": [],
+    "resources": ["freeCodeCamp", "MDN Web Docs", "JavaScript.info"]
+  },
+  "react": {
+    "months_to_learn": 4,
+    "difficulty": "moderate",
+    "prerequisites": ["javascript", "html", "css"],
+    "resources": ["React Docs", "Scrimba", "Udemy React courses"]
+  },
+  "angular": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["typescript", "javascript", "rxjs"],
+    "resources": ["Angular Docs", "Pluralsight", "Udemy"]
+  },
+  "vue": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["javascript", "html", "css"],
+    "resources": ["Vue Docs", "Scrimba", "Vueschool"]
+  },
+  "typescript": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["javascript"],
+    "resources": ["TypeScript Handbook", "total TypeScript", "Udemy"]
+  },
+  "html": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["MDN", "W3Schools", "freeCodeCamp"]
+  },
+  "css": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["html"],
+    "resources": ["CSS-Tricks", "MDN", "freeCodeCamp"]
+  },
+  "node.js": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["javascript"],
+    "resources": ["Node.js Docs", "Udemy", "NodeSchool"]
+  },
+  "python": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["Python.org Docs", "codecademy", "Real Python"]
+  },
+  "django": {
+    "months_to_learn": 4,
+    "difficulty": "moderate",
+    "prerequisites": ["python", "sql"],
+    "resources": ["Django Docs", "Django for Beginners", "Udemy"]
+  },
+  "flask": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": ["python"],
+    "resources": ["Flask Docs", "Miguel Grinberg's Mega Tutorial", "Udemy"]
+  },
+  "fastapi": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["python"],
+    "resources": ["FastAPI Docs", "Udemy", "Real Python"]
+  },
+  "java": {
+    "months_to_learn": 4,
+    "difficulty": "moderate",
+    "prerequisites": [],
+    "resources": ["Java Docs", "Head First Java", "Udemy"]
+  },
+  "spring boot": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["java", "sql"],
+    "resources": ["Spring Docs", "Spring Boot in Action", "Udemy"]
+  },
+  "spring security": {
+    "months_to_learn": 3,
+    "difficulty": "hard",
+    "prerequisites": ["spring boot", "authentication"],
+    "resources": ["Spring Security Docs", "Udemy", "Baeldung"]
+  },
+  "hibernate": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["java", "sql", "jpa"],
+    "resources": ["Hibernate Docs", "Udemy", "Hibernica"]
+  },
+  "csharp": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": [],
+    "resources": ["C# Docs", "Microsoft Learn", "Udemy"]
+  },
+  "asp.net": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["csharp", "sql"],
+    "resources": ["ASP.NET Docs", "Microsoft Learn", "Udemy"]
+  },
+  "ruby": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["Ruby Docs", "Why's Poignant Guide", "codecademy"]
+  },
+  "ruby on rails": {
+    "months_to_learn": 4,
+    "difficulty": "moderate",
+    "prerequisites": ["ruby", "sql"],
+    "resources": ["Rails Guides", "Railscasts", "Udemy"]
+  },
+  "go": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": [],
+    "resources": ["Go Docs", "A Tour of Go", "Udemy"]
+  },
+  "rust": {
+    "months_to_learn": 6,
+    "difficulty": "very hard",
+    "prerequisites": [],
+    "resources": ["Rust Book", "Rustlings", "Exercism"]
+  },
+  "sql": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["SQL Zoo", "HackerRank", "W3Schools"]
+  },
+  "mysql": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": ["sql"],
+    "resources": ["MySQL Docs", "Udemy", "PluralSight"]
+  },
+  "postgresql": {
+    "months_to_learn": 2,
+    "difficulty": "easy",
+    "prerequisites": ["sql"],
+    "resources": ["PostgreSQL Docs", "Udemy", "PluralSight"]
+  },
+  "mongodb": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["json"],
+    "resources": ["MongoDB Docs", "MongoDB University", "Udemy"]
+  },
+  "redis": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["databases"],
+    "resources": ["Redis Docs", "Redis University", "Udemy"]
+  },
+  "elasticsearch": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["databases", "json"],
+    "resources": ["Elasticsearch Docs", "Elastic University", "Udemy"]
+  },
+  "docker": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["linux basics"],
+    "resources": ["Docker Docs", "Docker for Developers", "Udemy"]
+  },
+  "kubernetes": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["docker", "devops"],
+    "resources": ["Kubernetes Docs", "Linux Academy", "Udemy"]
+  },
+  "terraform": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["cloud platforms"],
+    "resources": ["Terraform Docs", "HashiCorp Learn", "Udemy"]
+  },
+  "ansible": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["linux basics"],
+    "resources": ["Ansible Docs", "Red Hat Learning", "Udemy"]
+  },
+  "jenkins": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["ci/cd"],
+    "resources": ["Jenkins Docs", "Linux Academy", "Udemy"]
+  },
+  "github actions": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["git"],
+    "resources": ["GitHub Actions Docs", "GitHub Learning Lab", "YouTube"]
+  },
+  "git": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["Pro Git Book", "GitHub Learning Lab", "Atlassian Tutorials"]
+  },
+  "machine learning": {
+    "months_to_learn": 6,
+    "difficulty": "hard",
+    "prerequisites": ["python", "statistics", "linear algebra"],
+    "resources": ["Andrew Ng's ML Course", "Fast.ai", "Coursera"]
+  },
+  "tensorflow": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["python", "machine learning"],
+    "resources": ["TensorFlow Docs", "TensorFlow Certificate", "Udemy"]
+  },
+  "pytorch": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["python", "machine learning"],
+    "resources": ["PyTorch Docs", "Fast.ai", "Udemy"]
+  },
+  "scikit-learn": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["python", "machine learning"],
+    "resources": ["scikit-learn Docs", "Real Python", "Datacamp"]
+  },
+  "deep learning": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["machine learning", "linear algebra"],
+    "resources": ["Deep Learning Specialization", "Fast.ai", "Deeplearning.AI"]
+  },
+  "natural language processing": {
+    "months_to_learn": 6,
+    "difficulty": "very hard",
+    "prerequisites": ["python", "machine learning", "deep learning"],
+    "resources": ["NLP with Transformers", "Stanford NLP", "Fast.ai NLP"]
+  },
+  "computer vision": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["python", "machine learning", "deep learning"],
+    "resources": ["Fast.ai CV", "OpenCV Tutorials", "PyImageSearch"]
+  },
+  "reinforcement learning": {
+    "months_to_learn": 6,
+    "difficulty": "very hard",
+    "prerequisites": ["machine learning", "mathematics"],
+    "resources": ["RL Sutton & Barto", "OpenAI Spinning Up", "Udacity"]
+  },
+  "pandas": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["python"],
+    "resources": ["pandas Docs", "Real Python", "Datacamp"]
+  },
+  "numpy": {
+    "months_to_learn": 1,
+    "difficulty": "moderate",
+    "prerequisites": ["python"],
+    "resources": ["NumPy Docs", "Real Python", "Datacamp"]
+  },
+  "matplotlib": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["python"],
+    "resources": ["Matplotlib Docs", "Real Python", "Datacamp"]
+  },
+  "seaborn": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["python", "matplotlib"],
+    "resources": ["Seaborn Docs", "Real Python", "Datacamp"]
+  },
+  "plotly": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["python"],
+    "resources": ["Plotly Docs", "Datacamp", "Real Python"]
+  },
+  "jupyter notebook": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["python"],
+    "resources": ["Jupyter Docs", "Real Python", "Medium articles"]
+  },
+  "aws": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["cloud basics", "networking"],
+    "resources": ["AWS Training", "Linux Academy", "Udemy"]
+  },
+  "google cloud platform": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["cloud basics"],
+    "resources": ["GCP Training", "Coursera", "Udemy"]
+  },
+  "microsoft azure": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["cloud basics", "windows"],
+    "resources": ["Azure Learn", "Udemy", "PluralSight"]
+  },
+  "data analysis": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["python", "statistics", "sql"],
+    "resources": ["Real Python", "Datacamp", "Coursera"]
+  },
+  "tableau": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["data analysis"],
+    "resources": ["Tableau Public", "Udemy", "Data Viz Academy"]
+  },
+  "power bi": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["data analysis"],
+    "resources": ["Microsoft Learn", "Udemy", "LinkedIn Learning"]
+  },
+  "apache spark": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["big data", "scala"],
+    "resources": ["Spark Docs", "Databricks Training", "Udemy"]
+  },
+  "hadoop": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["big data", "java"],
+    "resources": ["Hadoop Docs", "Hortonworks", "Udemy"]
+  },
+  "kafka": {
+    "months_to_learn": 3,
+    "difficulty": "hard",
+    "prerequisites": ["distributed systems", "java"],
+    "resources": ["Kafka Docs", "Confluent Training", "Udemy"]
+  },
+  "etl": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["sql", "databases"],
+    "resources": ["ETL Best Practices", "Udemy", "Talend Academy"]
+  },
+  "rest": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["http", "json"],
+    "resources": ["REST API Design", "RESTful Best Practices", "Udemy"]
+  },
+  "graphql": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["api design"],
+    "resources": ["GraphQL Docs", "How to GraphQL", "Udemy"]
+  },
+  "microservices": {
+    "months_to_learn": 5,
+    "difficulty": "very hard",
+    "prerequisites": ["system design", "docker", "distributed systems"],
+    "resources": ["Building Microservices", "Sam Newman", "Udemy"]
+  },
+  "serverless": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["cloud platforms"],
+    "resources": ["Serverless Framework", "AWS Lambda", "Udemy"]
+  },
+  "system design": {
+    "months_to_learn": 6,
+    "difficulty": "very hard",
+    "prerequisites": ["algorithms", "databases", "networking"],
+    "resources": ["Designing Data-Intensive Applications", "System Design Interview", "AlgoExpert"]
+  },
+  "devops": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["linux basics"],
+    "resources": ["The DevOps Handbook", "Linux Academy", "Udemy"]
+  },
+  "mlops": {
+    "months_to_learn": 5,
+    "difficulty": "very hard",
+    "prerequisites": ["machine learning", "devops"],
+    "resources": ["Made With ML", "Andrew Ng MLOps", "Coursera"]
+  },
+  "statistics": {
+    "months_to_learn": 4,
+    "difficulty": "hard",
+    "prerequisites": ["mathematics"],
+    "resources": ["Statistical Rethinking", "Coursera", "Khan Academy"]
+  },
+  "linear algebra": {
+    "months_to_learn": 3,
+    "difficulty": "hard",
+    "prerequisites": ["mathematics"],
+    "resources": ["3Blue1Brown Linear Algebra", "Khan Academy", "Gilbert Strang"]
+  },
+  "agile": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": [],
+    "resources": ["Scrum Guide", "Agile Manifesto", "Udemy"]
+  },
+  "scrum": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["agile"],
+    "resources": ["Scrum.org", "Scrum Master Certification", "Udemy"]
+  },
+  "security": {
+    "months_to_learn": 5,
+    "difficulty": "hard",
+    "prerequisites": ["networking", "cryptography"],
+    "resources": ["OWASP Top 10", "HTB Academy", "Udemy"]
+  },
+  "cryptography": {
+    "months_to_learn": 3,
+    "difficulty": "hard",
+    "prerequisites": ["mathematics"],
+    "resources": ["Cryptography I", "Coursera", "Applied Cryptography"]
+  },
+  "feature engineering": {
+    "months_to_learn": 3,
+    "difficulty": "moderate",
+    "prerequisites": ["machine learning", "data analysis"],
+    "resources": ["Feature Engineering for ML", "Real Python", "Udemy"]
+  },
+  "experiment tracking": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["machine learning"],
+    "resources": ["MLflow Docs", "Weights & Biases", "Made With ML"]
+  },
+  "model deployment": {
+    "months_to_learn": 3,
+    "difficulty": "hard",
+    "prerequisites": ["mlops", "docker"],
+    "resources": ["Made With ML", "Full Stack Deep Learning", "Udemy"]
+  },
+  "linear regression": {
+    "months_to_learn": 1,
+    "difficulty": "moderate",
+    "prerequisites": ["statistics"],
+    "resources": ["StatQuest", "Khan Academy", "Real Python"]
+  },
+  "logistic regression": {
+    "months_to_learn": 1,
+    "difficulty": "moderate",
+    "prerequisites": ["linear regression"],
+    "resources": ["StatQuest", "Real Python", "Coursera"]
+  },
+  "decision trees": {
+    "months_to_learn": 1,
+    "difficulty": "easy",
+    "prerequisites": ["machine learning"],
+    "resources": ["StatQuest", "Scikit-learn Docs", "Real Python"]
+  },
+  "random forest": {
+    "months_to_learn": 1,
+    "difficulty": "moderate",
+    "prerequisites": ["decision trees"],
+    "resources": ["StatQuest", "Real Python", "Udemy"]
+  },
+  "xgboost": {
+    "months_to_learn": 2,
+    "difficulty": "hard",
+    "prerequisites": ["machine learning", "gradient boosting"],
+    "resources": ["XGBoost Docs", "Real Python", "Udemy"]
+  },
+  "prompt engineering": {
+    "months_to_learn": 2,
+    "difficulty": "moderate",
+    "prerequisites": ["natural language processing"],
+    "resources": ["OpenAI Docs", "Prompt Engineering Guide", "LangChain Docs"]
+  }
+}

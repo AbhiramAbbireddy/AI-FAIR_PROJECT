@@ -1,0 +1,20 @@
+{
+  "resume_001": [
+    "python",
+    "machine learning",
+    "tensorflow",
+    "sql"
+  ],
+  "resume_002": [
+    "javascript",
+    "react",
+    "node.js",
+    "css"
+  ],
+  "resume_003": [
+    "java",
+    "spring boot",
+    "microservices",
+    "docker"
+  ]
+}

@@ -8,10 +8,32 @@ import tempfile
 
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 
-from src.skill_extraction.extractor import extract_skills, extract_text
-from src.models.schemas import ExtractedSkill
+from src.resume_parser import parse_resume
+from src.models.schemas import ExtractedSkill, ResumeParseResult
+from src.skill_extractor import extract_skills
 
 router = APIRouter(prefix="/resume", tags=["Resume"])
+
+
+@router.post("/parse", response_model=ResumeParseResult)
+async def parse_resume_endpoint(
+    file: UploadFile = File(...),
+):
+    """Upload a resume and extract core metadata from the canonical parser."""
+    allowed_ext = {".pdf", ".docx", ".txt"}
+    ext = os.path.splitext(file.filename or "")[-1].lower()
+    if ext not in allowed_ext:
+        raise HTTPException(400, f"Unsupported file type: {ext}")
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext or ".pdf") as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    try:
+        return parse_resume(tmp_path, filename=file.filename or "")
+    finally:
+        os.unlink(tmp_path)
 
 
 @router.post("/extract-skills", response_model=list[ExtractedSkill])
@@ -33,8 +55,8 @@ async def extract_skills_endpoint(
         tmp_path = tmp.name
 
     try:
-        text = extract_text(tmp_path, filename=file.filename or "")
-        skills = extract_skills(text, use_ner=use_ner)
+        parsed_resume = parse_resume(tmp_path, filename=file.filename or "")
+        skills = extract_skills(parsed_resume.text, use_ner=use_ner)
         return skills
     finally:
         os.unlink(tmp_path)

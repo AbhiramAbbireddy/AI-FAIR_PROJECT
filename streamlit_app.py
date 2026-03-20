@@ -31,19 +31,21 @@ from src.config.settings import (
     SKILL_CATEGORIES,
 )
 from src.fairness.detector import evaluate_fairness
-from src.forecasting.trend_forecaster import compute_current_demand, get_skill_trends
-from src.job_pipeline.collector import JobCollector, load_static_jobs
-from src.matching.semantic_matcher import match_resume_to_jobs
+from src.job_matcher import jobs_df_to_postings, match_resume_to_jobs
 from src.models.schemas import (
     ExtractedSkill,
     FairnessReport,
     MatchResult,
+    ResumeParseResult,
     SkillGap,
     SkillTrend,
 )
 from src.role_mapping.matcher import match_roles, RoleMatch
-from src.skill_extraction.extractor import extract_skills, extract_text
+from src.resume_parser import parse_resume
+from src.shap_explainer import MatchSHAPExplainer
+from src.skill_extractor import extract_skills
 from src.skill_gap.ranker import rank_skill_gaps
+from src.trend_forecaster import get_skill_trends, get_trends_for_skills
 
 # New comprehensive gap analysis
 try:
@@ -57,24 +59,19 @@ except ImportError:
 # Cached loaders — run only once across reruns
 # ---------------------------------------------------------------------------
 
-@st.cache_resource(show_spinner="Loading Sentence-BERT model…")
-def _load_sbert():
-    """Pre-load SBERT so matching doesn't pay the startup cost."""
-    from src.matching.semantic_matcher import _get_sbert
-    return _get_sbert()
-
-
 @st.cache_data(show_spinner="Loading job database…")
 def _cached_load_jobs():
-    import os
-    from src.config.settings import JOBS_PARSED_PATH
-    from src.job_pipeline.collector import load_static_jobs
     if os.path.exists(JOBS_PARSED_PATH):
-        jobs_df = pd.read_csv(JOBS_PARSED_PATH, nrows=5000)
-    else:
-        jobs_df = pd.DataFrame()
-    postings = load_static_jobs(max_rows=5000)
-    return jobs_df, postings
+        return pd.read_csv(JOBS_PARSED_PATH, nrows=5000)
+    return pd.DataFrame()
+
+
+@st.cache_data(show_spinner="Preparing job postings…")
+def _cached_load_postings():
+    jobs_df = _cached_load_jobs()
+    if jobs_df.empty:
+        return []
+    return jobs_df_to_postings(jobs_df)
 
 
 @st.cache_resource(show_spinner="Loading comprehensive gap analysis…")
@@ -152,6 +149,7 @@ st.markdown(
 def _init_state():
     for key in (
         "resume_text",
+        "resume_profile",
         "skills",
         "matches",
         "role_matches",
@@ -159,6 +157,8 @@ def _init_state():
         "trends",
         "fairness",
         "comprehensive_gap_analysis",
+        "match_explanations",
+        "role_explanations",
     ):
         if key not in st.session_state:
             st.session_state[key] = None
@@ -166,10 +166,9 @@ def _init_state():
 
 _init_state()
 
-# Pre-load expensive resources on first run
-_load_sbert()
-_jobs_df, _postings = _cached_load_jobs()
-_gap_analyzer = _load_gap_analyzer() if HAS_GAP_ANALYSIS else None
+# Heavy resources are loaded lazily during analysis to keep startup fast.
+_jobs_df = None
+_gap_analyzer = None
 
 
 # ---------------------------------------------------------------------------
@@ -223,6 +222,10 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 
 if run_btn and uploaded is not None:
+    if _jobs_df is None:
+        _jobs_df = _cached_load_jobs()
+    if _gap_analyzer is None and HAS_GAP_ANALYSIS:
+        _gap_analyzer = _load_gap_analyzer()
 
     with st.status("Running full analysis…", expanded=True) as status:
         # 1 — Extract text
@@ -232,14 +235,16 @@ if run_btn and uploaded is not None:
             tmp.write(uploaded.getvalue())
             tmp_path = tmp.name
         try:
-            text = extract_text(tmp_path, filename=uploaded.name)
+            parsed_resume = parse_resume(tmp_path, filename=uploaded.name)
         finally:
             os.unlink(tmp_path)
 
+        text = parsed_resume.text
         if not text or len(text.strip()) < 30:
             st.error("Could not extract meaningful text from the file.")
             st.stop()
         st.session_state.resume_text = text
+        st.session_state.resume_profile = parsed_resume
 
         # 2 — Skill extraction
         st.write("🔍 Extracting skills…")
@@ -252,15 +257,51 @@ if run_btn and uploaded is not None:
         role_matches = match_roles(skill_names, min_score=min_score, top_n=top_n)
         st.session_state.role_matches = role_matches
 
-        # 4 — Skill gaps
+        # 4 — Job matching
+        st.write("🎯 Matching job postings…")
+        postings = _cached_load_postings()
+        matches = match_resume_to_jobs(
+            text,
+            skill_names,
+            postings,
+            top_n=top_n,
+            min_score=float(min_score),
+            use_semantic=False,
+        )
+        st.session_state.matches = matches
+
+        # 4b — SHAP explainability
+        st.write("🧠 Building SHAP explanations…")
+        try:
+            explainer = MatchSHAPExplainer()
+            st.session_state.match_explanations = explainer.explain_job_matches(
+                text,
+                skill_names,
+                matches[:5],
+                postings,
+            )
+            st.session_state.role_explanations = explainer.explain_role_matches(
+                text,
+                skill_names,
+                role_matches[:5],
+            )
+        except Exception as exc:
+            st.warning(f"Explainability fallback activated: {str(exc)[:180]}")
+            st.session_state.match_explanations = {}
+            st.session_state.role_explanations = {}
+
+        # 5 — Skill gaps
         st.write("📊 Analysing skill gaps…")
         if _jobs_df is not None and not _jobs_df.empty:
             gaps = rank_skill_gaps(skill_names, _jobs_df, top_n=15)
+            trends = get_skill_trends(_jobs_df)
         else:
             gaps = []
+            trends = []
         st.session_state.gaps = gaps
+        st.session_state.trends = trends
 
-        # 4b — Comprehensive skill gap analysis
+        # 5b — Comprehensive skill gap analysis
         st.write("📊 Running comprehensive gap analysis…")
         comprehensive_analysis = None
         try:
@@ -293,12 +334,21 @@ if run_btn and uploaded is not None:
                     "learning_style": learning_style.split()[0],  # "hands-on" from "hands-on (projects)"
                     "budget": budget.split()[0]  # "free" from "free only"
                 }
+                trend_map = {
+                    trend.skill.lower(): {
+                        "growth_rate": trend.growth_pct,
+                        "trend": trend.forecast_demand,
+                        "current_pct": trend.current_pct,
+                    }
+                    for trend in trends
+                }
                 
                 comprehensive_analysis = analyzer_to_use.analyze_for_job(
                     user_skills=skill_names,
                     job_data=job_data,
                     current_match_score=top_role.score,
                     user_context=user_context,
+                    trend_data=trend_map,
                 )
                 st.session_state.comprehensive_gap_analysis = comprehensive_analysis
                 st.write("  ✅ Comprehensive analysis complete!")
@@ -310,15 +360,10 @@ if run_btn and uploaded is not None:
             if st.checkbox("Show full error trace"):
                 st.code(traceback.format_exc())
 
-        # 5 — Trends
+        # 6 — Trends
         st.write("📈 Computing trends…")
-        if _jobs_df is not None and not _jobs_df.empty:
-            trends = get_skill_trends(_jobs_df)
-        else:
-            trends = []
-        st.session_state.trends = trends
 
-        # 6 — Fairness
+        # 7 — Fairness
         st.write("⚖️ Evaluating fairness…")
         fairness = evaluate_fairness(text)
         st.session_state.fairness = fairness
@@ -333,14 +378,28 @@ elif run_btn and uploaded is None:
 # ---------------------------------------------------------------------------
 
 if st.session_state.skills is not None:
-    tab_skills, tab_roles, tab_gaps, tab_trends, tab_fair, tab_raw = st.tabs(
+    tab_skills, tab_roles, tab_gaps, tab_trends, tab_fair, tab_raw, tab_matches = st.tabs(
         ["🔍 Skills", "🎯 Suitable Roles", "📊 Skill Gaps", "📈 Trends", "⚖️ Fairness", "📝 Resume Text"]
+        + ["Top Matches"]
     )
 
     # ── TAB: Skills ────────────────────────────────────────────────────
     with tab_skills:
         skills: list[ExtractedSkill] = st.session_state.skills
+        resume_profile: ResumeParseResult | None = st.session_state.resume_profile
         st.subheader(f"Extracted Skills ({len(skills)})")
+
+        if resume_profile is not None:
+            profile_cols = st.columns(3)
+            profile_cols[0].metric("Email", resume_profile.email or "Not found")
+            profile_cols[1].metric("Phone", resume_profile.phone or "Not found")
+            exp_value = (
+                f"{resume_profile.experience_years} yrs"
+                if resume_profile.experience_years is not None
+                else "Not found"
+            )
+            profile_cols[2].metric("Experience", exp_value)
+            st.divider()
 
         # Group by category
         cat_map: dict[str, list[ExtractedSkill]] = {}
@@ -386,6 +445,111 @@ if st.session_state.skills is not None:
             st.dataframe(df, use_container_width=True, hide_index=True)
 
     # ── TAB: Suitable Roles ─────────────────────────────────────────
+    with tab_matches:
+        matches: list[MatchResult] = st.session_state.matches or []
+        st.subheader(f"Top Job Matches ({len(matches)})")
+
+        if not matches:
+            st.info("No job matches found yet. Try lowering the minimum score or uploading a resume with clearer skills.")
+        else:
+            top_match = matches[0]
+            summary_cols = st.columns(4)
+            summary_cols[0].metric("Best Match", top_match.job.title)
+            summary_cols[1].metric("Top Score", f"{top_match.overall_score:.1f}%")
+            summary_cols[2].metric("Jobs Returned", len(matches))
+            summary_cols[3].metric(
+                "Avg Score",
+                f"{(sum(match.overall_score for match in matches) / len(matches)):.1f}%",
+            )
+
+            st.divider()
+
+            for index, match in enumerate(matches, 1):
+                with st.expander(
+                    f"**#{index} - {match.job.title}** at **{match.job.company}** - {match.overall_score:.1f}%",
+                    expanded=index <= 3,
+                ):
+                    info_cols = st.columns(4)
+                    info_cols[0].metric("Overall", f"{match.overall_score:.1f}%")
+                    info_cols[1].metric("Skill Fit", f"{match.skill_score:.1f}%")
+                    info_cols[2].metric("Experience", f"{match.experience_score:.1f}%")
+                    info_cols[3].metric("Semantic", f"{match.semantic_score:.1f}%")
+
+                    meta_parts = [match.job.location, match.job.experience_level]
+                    if match.job.remote:
+                        meta_parts.append("Remote")
+                    st.caption(" | ".join(part for part in meta_parts if part))
+
+                    if match.job.description:
+                        preview = match.job.description[:400]
+                        if len(match.job.description) > 400:
+                            preview += "..."
+                        st.write(preview)
+
+                    skill_left, skill_right = st.columns(2)
+                    with skill_left:
+                        st.markdown("**Matching Skills**")
+                        matched_skills = match.matched_required + match.matched_preferred
+                        if matched_skills:
+                            matched_html = "".join(
+                                f'<span class="skill-chip chip-advanced">{skill}</span>'
+                                for skill in match.matched_required
+                            ) + "".join(
+                                f'<span class="skill-chip chip-intermediate">{skill}</span>'
+                                for skill in match.matched_preferred
+                            )
+                            st.markdown(matched_html, unsafe_allow_html=True)
+                        else:
+                            st.caption("No explicit skill overlap found.")
+
+                    with skill_right:
+                        st.markdown("**Missing Required Skills**")
+                        if match.missing_required:
+                            missing_html = "".join(
+                                f'<span class="skill-chip chip-basic">{skill}</span>'
+                                for skill in match.missing_required
+                            )
+                            st.markdown(missing_html, unsafe_allow_html=True)
+                        else:
+                            st.success("You cover all required skills for this posting.")
+
+                    st.progress(min(match.overall_score / 100.0, 1.0))
+
+                    explanation = (st.session_state.match_explanations or {}).get(match.job.job_id)
+                    if explanation:
+                        st.markdown("**Why This Match? (SHAP)**")
+                        st.caption(explanation.get("summary", ""))
+
+                        exp_cols = st.columns(3)
+                        exp_cols[0].metric("Observed Score", f"{explanation.get('match_score', match.overall_score):.1f}%")
+                        exp_cols[1].metric("Explained Score", f"{explanation.get('predicted_score', match.overall_score):.1f}%")
+                        exp_cols[2].metric("Method", explanation.get("method", "heuristic").upper())
+
+                        pos_factors = explanation.get("positive_factors", [])
+                        neg_factors = explanation.get("negative_factors", [])
+                        reason_left, reason_right = st.columns(2)
+                        with reason_left:
+                            st.markdown("**Positive Drivers**")
+                            if pos_factors:
+                                for factor in pos_factors:
+                                    st.write(f"+ {factor['label']} ({factor['impact']:+.2f})")
+                            else:
+                                st.caption("No strong positive drivers found.")
+                        with reason_right:
+                            st.markdown("**Negative Drivers**")
+                            if neg_factors:
+                                for factor in neg_factors:
+                                    st.write(f"{factor['impact']:+.2f} {factor['label']}")
+                            else:
+                                st.caption("No strong negative drivers found.")
+
+                        chart_rows = [
+                            {"Factor": factor["label"], "Impact": factor["impact"]}
+                            for factor in pos_factors + neg_factors
+                        ]
+                        if chart_rows:
+                            st.bar_chart(pd.DataFrame(chart_rows), x="Factor", y="Impact")
+
     with tab_roles:
         role_matches: list[RoleMatch] = st.session_state.role_matches or []
         st.subheader(f"Suitable Job Roles ({len(role_matches)})")
@@ -442,6 +606,29 @@ if st.session_state.skills is not None:
 
                     # Progress bar
                     st.progress(min(rm.score / 100.0, 1.0))
+
+                    role_explanation = (st.session_state.role_explanations or {}).get(rm.role)
+                    if role_explanation:
+                        st.markdown("**Why This Role Fits? (SHAP)**")
+                        st.caption(role_explanation.get("summary", ""))
+
+                        pos_factors = role_explanation.get("positive_factors", [])
+                        neg_factors = role_explanation.get("negative_factors", [])
+                        reason_left, reason_right = st.columns(2)
+                        with reason_left:
+                            st.markdown("**Positive Drivers**")
+                            if pos_factors:
+                                for factor in pos_factors:
+                                    st.write(f"+ {factor['label']} ({factor['impact']:+.2f})")
+                            else:
+                                st.caption("No strong positive drivers found.")
+                        with reason_right:
+                            st.markdown("**Negative Drivers**")
+                            if neg_factors:
+                                for factor in neg_factors:
+                                    st.write(f"{factor['impact']:+.2f} {factor['label']}")
+                            else:
+                                st.caption("No strong negative drivers found.")
 
     # ── TAB: Skill Gaps ───────────────────────────────────────────────
     with tab_gaps:
@@ -866,6 +1053,37 @@ if st.session_state.skills is not None:
         if not trends:
             st.info("No trend data available. Ensure job data exists in the processed directory.")
         else:
+            relevant_skills: list[str] = []
+            top_matches: list[MatchResult] = st.session_state.matches or []
+            if top_matches:
+                for match in top_matches[:3]:
+                    relevant_skills.extend(match.missing_required)
+            if not relevant_skills:
+                gaps: list[SkillGap] = st.session_state.gaps or []
+                relevant_skills.extend(gap.skill for gap in gaps[:10])
+
+            if _jobs_df is not None and relevant_skills:
+                relevant_trends = get_trends_for_skills(_jobs_df, relevant_skills)
+            else:
+                trend_lookup = {trend.skill.lower(): trend for trend in trends}
+                relevant_trends = [
+                    trend_lookup[skill.lower()]
+                    for skill in dict.fromkeys(relevant_skills)
+                    if skill.lower() in trend_lookup
+                ]
+
+            if relevant_trends:
+                st.markdown("### Trends For Your Missing Skills")
+                rel_cols = st.columns(min(3, len(relevant_trends)))
+                for index, trend in enumerate(relevant_trends[:6]):
+                    delta = f"{trend.growth_pct:+.1f}%"
+                    rel_cols[index % len(rel_cols)].metric(
+                        trend.skill,
+                        trend.forecast_demand,
+                        delta=delta,
+                    )
+                st.divider()
+
             # Top growing
             growing = sorted(trends, key=lambda t: -t.growth_pct)[:10]
             declining = sorted(trends, key=lambda t: t.growth_pct)[:5]
@@ -925,6 +1143,29 @@ if st.session_state.skills is not None:
             c2.metric("Age Bias", fairness.age_bias)
             c3.metric("Education Bias", fairness.education_bias)
             c4.metric("Experience Bias", fairness.experience_bias)
+
+            extra_cols = st.columns(2)
+            extra_cols[0].metric("Mitigated Score", f"{fairness.mitigated_score:.1f}")
+            extra_cols[1].metric("DPD", f"{fairness.demographic_parity_difference:.3f}")
+
+            if fairness.variant_scores:
+                st.markdown("### Synthetic Variant Sensitivity")
+                variant_df = pd.DataFrame(
+                    [
+                        {"variant": variant_name, "score": score}
+                        for variant_name, score in fairness.variant_scores.items()
+                    ]
+                )
+                st.dataframe(variant_df, use_container_width=True, hide_index=True)
+
+            if fairness.anonymized_text_preview:
+                with st.expander("Anonymized Resume Preview"):
+                    st.text_area(
+                        "Preview",
+                        fairness.anonymized_text_preview,
+                        height=180,
+                        disabled=True,
+                    )
 
             # Per-word SHAP bars
             if fairness.indicators:

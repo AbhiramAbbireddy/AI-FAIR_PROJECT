@@ -379,7 +379,7 @@ def extract_skills(
     seen: set[str] = set()
     results: list[ExtractedSkill] = []
     for raw_name, section in raw_skills:
-        canon = normalize_skill(raw_name)
+        canon = normalize_skill(raw_name, allow_semantic_fallback=False)
         if canon in seen:
             continue
         seen.add(canon)

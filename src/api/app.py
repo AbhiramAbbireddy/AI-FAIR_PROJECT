@@ -60,6 +60,7 @@ async def root():
         "version": "2.0.0",
         "docs": "/docs",
         "endpoints": [
+            "/resume/parse",
             "/resume/extract-skills",
             "/resume/parse-text",
             "/jobs/match",

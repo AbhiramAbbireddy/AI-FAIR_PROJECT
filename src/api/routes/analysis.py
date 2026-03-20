@@ -12,9 +12,8 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from src.config.settings import JOBS_PARSED_PATH
 from src.fairness.detector import evaluate_fairness
-from src.forecasting.trend_forecaster import compute_current_demand, get_skill_trends
+from src.job_matcher import match_resume_to_jobs
 from src.job_pipeline.collector import load_static_jobs
-from src.matching.semantic_matcher import match_resume_to_jobs
 from src.models.schemas import (
     ExtractedSkill,
     FairnessReport,
@@ -23,8 +22,10 @@ from src.models.schemas import (
     SkillTrend,
 )
 from src.role_mapping.matcher import match_roles
-from src.skill_extraction.extractor import extract_skills, extract_text
+from src.resume_parser import parse_resume
+from src.skill_extractor import extract_skills
 from src.skill_gap.ranker import rank_skill_gaps
+from src.trend_forecaster import compute_current_demand, get_skill_trends
 
 router = APIRouter(prefix="/analysis", tags=["Analysis"])
 
@@ -58,7 +59,7 @@ def _extract_resume(file_bytes: bytes, filename: str) -> str:
         tmp.write(file_bytes)
         tmp_path = tmp.name
     try:
-        return extract_text(tmp_path, filename=filename)
+        return parse_resume(tmp_path, filename=filename).text
     finally:
         os.unlink(tmp_path)
 

@@ -16,6 +16,13 @@ class ExtractedSkill(BaseModel):
     confidence: float = 1.0
 
 
+class ResumeParseResult(BaseModel):
+    text: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    experience_years: Optional[int] = None
+
+
 class SkillGap(BaseModel):
     skill: str
     job_count: int = 0
@@ -77,6 +84,11 @@ class FairnessReport(BaseModel):
     experience_bias: str = "None detected"
     indicators: list[BiasIndicator] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
+    mitigation_applied: bool = False
+    mitigated_score: float = 100.0
+    demographic_parity_difference: float = 0.0
+    variant_scores: dict[str, float] = Field(default_factory=dict)
+    anonymized_text_preview: str = ""
 
 
 # ── Trend ──────────────────────────────────────────────────────────────
