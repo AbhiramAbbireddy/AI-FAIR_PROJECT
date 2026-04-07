@@ -59,7 +59,10 @@ from src.shap_explainer import MatchSHAPExplainer
 from src.skill_extractor import extract_skills
 from src.skill_gap.ranker import rank_skill_gaps
 from src.learning_path_visualizer import render_learning_path
+<<<<<<< HEAD
 from src.temporal_job_dynamics import analyze_role_temporal_dynamics
+=======
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
 from src.trend_forecaster import get_skill_trends, get_trends_for_skills
 
 # New comprehensive gap analysis
@@ -248,7 +251,11 @@ with st.sidebar:
         help="Upload your resume to begin analysis.",
     )
     st.divider()
+<<<<<<< HEAD
     st.subheader("Options")
+=======
+    st.subheader("⚙️ Options")
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
     use_ner = st.toggle("Use NER extraction", value=False, help="RoBERTa NER improves extraction but makes analysis slower.")
     top_n = st.slider("Top N role suggestions", 5, 30, 10)
     min_score = st.slider("Minimum match score", 0, 80, 10, step=5)
@@ -337,6 +344,15 @@ if run_btn and uploaded is not None:
         st.write("Building SHAP explanations...")
         try:
             explainer = MatchSHAPExplainer()
+<<<<<<< HEAD
+=======
+            st.session_state.match_explanations = explainer.explain_job_matches(
+                text,
+                skill_names,
+                matches[:3],
+                postings,
+            )
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
             st.session_state.role_explanations = explainer.explain_role_matches(
                 text,
                 skill_names,
@@ -1150,7 +1166,11 @@ if st.session_state.skills is not None:
                                 )
                                 with st.expander(
                                     f"{month_label}: {milestone.get('skill', 'Unknown')} "
+<<<<<<< HEAD
                                     f"({milestone.get('category', 'N/A')}) -> {milestone.get('match_score_after', 0):.0f}%",
+=======
+                                    f"({milestone.get('category', 'N/A')}) → {milestone.get('match_score_after', 0):.0f}%",
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
                                     expanded=(idx <= 2)
                                 ):
                                     # Milestone details

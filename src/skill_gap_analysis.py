@@ -49,7 +49,11 @@ class SkillGapAnalysis:
             try:
                 self.llm_generator = LLMLearningPathGenerator()
                 self.use_llm = bool(getattr(self.llm_generator, "available", True))
+<<<<<<< HEAD
                 print("LLM-powered learning paths enabled")
+=======
+                print("✓ LLM-powered learning paths enabled (Gemini API)")
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
             except Exception as e:
                 print(f"LLM not available: {e}")
                 print("Using rule-based learning paths instead")

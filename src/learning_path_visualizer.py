@@ -196,4 +196,8 @@ def render_learning_path(roadmap: dict, initial_score: float) -> None:
     if not roadmap.get("milestones"):
         st.warning("No milestones found in the roadmap.")
         return
+<<<<<<< HEAD
     components.html(_build_html(roadmap, initial_score), height=_estimate_height(roadmap), scrolling=False)
+=======
+    components.html(_build_html(roadmap, initial_score), height=_estimate_height(roadmap), scrolling=False)
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c

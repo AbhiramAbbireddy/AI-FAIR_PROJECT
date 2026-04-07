@@ -308,6 +308,26 @@ class LLMLearningPathGenerator:
             item.get("skill", "").lower(): float(item.get("priority_score", 50.0))
             for item in missing_skills
             if item.get("skill")
+<<<<<<< HEAD
+        }
+
+        roadmap = generate_learning_path(
+            current_skills=user_skills,
+            missing_skills=skill_names,
+            priority_rankings=priority_rankings,
+            match_score=current_match_score,
+            target_role=job_title,
+            hours_per_day=float(user_context.get("hours_per_day", 2.0)),
+            learning_style=str(user_context.get("learning_style", "hands-on")),
+            budget=str(user_context.get("budget", "budget-friendly")),
+            api_key=self.api_key,
+        )
+
+        return {
+            "learning_path": roadmap,
+            "provider": roadmap.get("_provider", "fallback"),
+=======
+>>>>>>> 762d549ff5cab1fc93bc6825be5008a3d4e0034c
         }
 
         roadmap = generate_learning_path(
