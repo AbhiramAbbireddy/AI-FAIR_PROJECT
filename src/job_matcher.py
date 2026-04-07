@@ -26,6 +26,7 @@ from src.matching.semantic_matcher import (
     _experience_score,
 )
 from src.models.schemas import JobPosting, MatchResult
+from src.skill_extraction.normalizer import normalize_skill
 
 
 @dataclass(slots=True)
@@ -62,8 +63,8 @@ def _prefilter_jobs(
 ) -> list[tuple[JobPosting, float, list[str], list[str], list[str]]]:
     scored: list[tuple[JobPosting, float, list[str], list[str], list[str]]] = []
     for job in jobs:
-        req_set = {skill.lower() for skill in job.required_skills}
-        pref_set = {skill.lower() for skill in job.preferred_skills}
+        req_set = {normalize_skill(skill) for skill in job.required_skills}
+        pref_set = {normalize_skill(skill) for skill in job.preferred_skills}
         skill_score, matched_req, matched_pref, missing_req, _ = _skill_overlap(
             resume_skills,
             req_set,
@@ -101,7 +102,7 @@ class JobMatcher:
 
         top_n = self.config.top_n if top_n is None else top_n
         min_score = self.config.min_score if min_score is None else min_score
-        resume_set = {skill.lower().strip() for skill in resume_skills}
+        resume_set = {normalize_skill(skill) for skill in resume_skills if str(skill).strip()}
         candidates = _prefilter_jobs(resume_set, jobs, self.config.prefilter_limit)
 
         semantic_scores: dict[str, float] = {}
@@ -125,8 +126,8 @@ class JobMatcher:
 
         results: list[MatchResult] = []
         for job, skill_score, matched_req, matched_pref, missing_req in candidates:
-            req_set = {skill.lower() for skill in job.required_skills}
-            pref_set = {skill.lower() for skill in job.preferred_skills}
+            req_set = {normalize_skill(skill) for skill in job.required_skills}
+            pref_set = {normalize_skill(skill) for skill in job.preferred_skills}
             semantic_score = semantic_scores.get(job.job_id, 0.0)
             experience_score = _experience_score(resume_text, job.experience_level) * 100
 
@@ -210,7 +211,14 @@ def jobs_df_to_postings(df: pd.DataFrame) -> list[JobPosting]:
         text = str(value)
         if text in ("", "nan", "None"):
             return []
-        return [token.strip() for token in text.split(",") if token.strip()]
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for token in text.split(","):
+            cleaned = normalize_skill(token)
+            if cleaned and cleaned not in seen:
+                normalized.append(cleaned)
+                seen.add(cleaned)
+        return normalized
 
     columns = {
         "job_id": df.get("job_id", pd.Series(dtype=str)).astype(str).tolist(),

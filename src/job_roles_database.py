@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from src.role_mapping.role_database import COMPREHENSIVE_JOB_DATABASE
+from src.skill_extraction.normalizer import normalize_skill
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,7 +31,7 @@ def _normalize_skills(skills: list[str] | tuple[str, ...] | None) -> tuple[str, 
     seen: set[str] = set()
     normalized: list[str] = []
     for skill in skills:
-        cleaned = str(skill).strip().lower()
+        cleaned = normalize_skill(str(skill))
         if not cleaned or cleaned in seen:
             continue
         seen.add(cleaned)

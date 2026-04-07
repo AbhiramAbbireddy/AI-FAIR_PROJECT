@@ -1,377 +1,328 @@
-import os
+"""
+Groq-powered learning path generator for FAIR-PATH.
+"""
+from __future__ import annotations
+
+import hashlib
 import json
-from dotenv import load_dotenv
-from typing import Dict, List, Optional
+import os
+import re
 import time
+from pathlib import Path
+from typing import Any
 
-# Try to import Gemini, but don't fail if not available
+from dotenv import load_dotenv
+
 try:
-    import google.generativeai as genai
-    HAS_GEMINI = True
-except ImportError:
-    HAS_GEMINI = False
-    genai = None
+    from groq import Groq
 
-class LLMLearningPathGenerator:
-    """Generate personalized learning paths using Google Gemini API"""
-    
-    def __init__(self):
-        """Initialize Gemini API"""
-        
-        if not HAS_GEMINI:
-            raise ImportError(
-                "google.generativeai package not found.\n"
-                "Install it with: pip install google-generativeai"
-            )
-        
-        load_dotenv()
-        
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError(
-                "❌ GEMINI_API_KEY not found in .env file.\n"
-                "Get your free key at: https://aistudio.google.com/app/apikey\n"
-                "Then create .env file with: GEMINI_API_KEY=your_key_here"
-            )
-        
-        genai.configure(api_key=api_key)
-        
-        # Use Gemini 1.5 Flash (free, fast, good quality)
-        self.model = genai.GenerativeModel(
-            'gemini-1.5-flash',
-            generation_config={
-                "temperature": 0.7,
-                "top_p": 0.95,
-                "max_output_tokens": 8192,
-            }
-        )
-        
-        print("✓ Gemini API initialized successfully")
-    
-    def generate_learning_path(
-        self,
-        user_skills: List[str],
-        missing_skills: List[Dict],
-        job_title: str,
-        job_description: str,
-        current_match_score: float,
-        user_context: Optional[Dict] = None
-    ) -> Dict:
-        """
-        Generate personalized learning path using Gemini API
-        
-        Args:
-            user_skills: List of skills user currently has
-            missing_skills: List of skills user needs to learn (with priorities)
-            job_title: Target job title
-            job_description: Full job description
-            current_match_score: Current match percentage
-            user_context: Optional dict with user preferences
-        
-        Returns:
-            Dict with structured learning path
-        """
-        
-        # Build the prompt
-        prompt = self._build_learning_path_prompt(
-            user_skills,
-            missing_skills,
-            job_title,
-            job_description,
-            current_match_score,
-            user_context or {}
-        )
-        
-        try:
-            print(f"🔄 Generating personalized learning path for {job_title}...")
-            
-            # Call Gemini API with retry
-            response = self._call_gemini_with_retry(prompt, max_retries=3)
-            
-            # Parse JSON response
-            learning_path = self._parse_gemini_response(response)
-            
-            # Validate structure
-            validated_path = self._validate_learning_path(learning_path)
-            
-            print("✓ Learning path generated successfully")
-            return validated_path
-            
-        except Exception as e:
-            print(f"⚠ Error generating learning path: {e}")
-            print("  Using fallback learning path...")
-            return self._fallback_learning_path(missing_skills, job_title)
-    
-    def _call_gemini_with_retry(self, prompt: str, max_retries: int = 3) -> str:
-        """Call Gemini API with retry logic"""
-        
-        for attempt in range(max_retries):
-            try:
-                response = self.model.generate_content(prompt)
-                return response.text
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    raise
-                print(f"  Attempt {attempt + 1} failed: {e}")
-                print(f"  Retrying in 2 seconds...")
-                time.sleep(2)
-    
-    def _build_learning_path_prompt(
-        self,
-        user_skills: List[str],
-        missing_skills: List[Dict],
-        job_title: str,
-        job_description: str,
-        current_match_score: float,
-        user_context: Dict
-    ) -> str:
-        """Build structured prompt for Gemini"""
-        
-        experience = user_context.get("experience_level", "intermediate")
-        time_available = user_context.get("available_time", "part-time")
-        learning_style = user_context.get("learning_style", "hands-on")
-        budget = user_context.get("budget", "budget-friendly")
-        
-        # Format missing skills
-        skills_text = "\n".join([
-            f"- {skill['skill']} (Priority: {skill.get('priority_score', 0)}/100, Category: {skill.get('category', 'OTHER')})"
-            for skill in missing_skills[:10]
-        ])
-        
-        prompt = f"""You are an expert career advisor creating a detailed, personalized learning roadmap.
+    HAS_GROQ = True
+except ImportError:
+    Groq = None
+    HAS_GROQ = False
+
+
+CACHE_DIR = Path("cache/learning_paths")
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _cache_key(payload: dict[str, Any]) -> str:
+    raw = json.dumps(payload, sort_keys=True)
+    return hashlib.md5(raw.encode("utf-8")).hexdigest()
+
+
+def _load_cache(key: str) -> dict | None:
+    path = CACHE_DIR / f"{key}.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _save_cache(key: str, data: dict) -> None:
+    path = CACHE_DIR / f"{key}.json"
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def _build_prompt(
+    current_skills: list[str],
+    missing_skills: list[str],
+    priority_rankings: dict[str, float],
+    match_score: float,
+    target_role: str,
+    hours_per_day: float = 2.0,
+    learning_style: str = "hands-on",
+    budget: str = "budget-friendly",
+) -> str:
+    ranked = sorted(
+        missing_skills,
+        key=lambda skill: priority_rankings.get(skill.lower(), priority_rankings.get(skill, 50.0)),
+        reverse=True,
+    )
+    ranked_text = "\n".join(
+        f"- {skill}: priority score {priority_rankings.get(skill.lower(), priority_rankings.get(skill, 50.0))}/100"
+        for skill in ranked
+    )
+
+    current_skill_text = ", ".join(current_skills) if current_skills else "none yet"
+    return f"""You are an expert career advisor specializing in tech learning paths.
 
 USER PROFILE:
-- Current Skills: {', '.join(user_skills) if user_skills else 'None specified'}
-- Experience Level: {experience}
-- Time Available: {time_available}
-- Learning Style: {learning_style}
+- Target role: {target_role}
+- Current match score: {match_score:.0f}%
+- Current skills: {current_skill_text}
+- Missing skills (ranked by priority):
+{ranked_text}
+- Daily study time: {hours_per_day} hours/day
+- Learning style: {learning_style}
 - Budget: {budget}
-- Current Match Score for Target Role: {current_match_score}%
 
-TARGET JOB:
-- Job Title: {job_title}
-- Job Description: {job_description[:500] if job_description else 'No description provided'}...
+TASK:
+Create a realistic month-by-month roadmap to reach the target role and improve the match score toward 90% or higher.
 
-SKILLS TO LEARN (Priority Ranked):
-{skills_text}
+RULES:
+1. Respect skill prerequisites where relevant.
+2. Higher priority skills should generally appear earlier.
+3. Recommend specific resources and practical projects.
+4. Keep the roadmap realistic for the available study time.
+5. Respond with valid JSON only.
 
-TASK: Create a detailed, month-by-month learning roadmap.
-
-CRITICAL REQUIREMENTS:
-1. Return ONLY valid JSON - no markdown, no explanation
-2. Include specific resource names (actual courses, books, communities)
-3. Check for prerequisites - include them if user lacks them
-4. Mix quick wins (easy, high-impact) with long-term investments
-5. Be specific about timelines based on {time_available}
-6. Realistic for {experience} level learners
-
-OUTPUT: Return ONLY this JSON structure (fill all fields):
-
+JSON SCHEMA:
 {{
-  "learning_path": {{
-    "initial_match_score": {current_match_score},
-    "target_match_score": 90,
-    "total_duration_months": 6,
-    "estimated_hours_total": 200,
-    
-    "phases": [
-      {{
-        "phase_number": 1,
-        "phase_name": "Foundation",
-        "duration_months": 2,
-        "skills_covered": ["Skill1", "Skill2"],
-        "match_score_after": 75
-      }}
-    ],
-    
-    "milestones": [
-      {{
-        "month": 1,
-        "week_range": "1-4",
-        "skill": "Skill Name",
-        "category": "CRITICAL",
-        "priority_score": 85,
-        "learning_objectives": ["Objective 1", "Objective 2"],
-        "resources": [
-          {{
-            "type": "course",
-            "name": "Specific Course Name",
-            "platform": "Platform Name",
-            "duration": "4 hours",
-            "cost": "free"
-          }}
-        ],
-        "practice_projects": ["Project 1", "Project 2"],
-        "estimated_hours_per_week": 8,
-        "difficulty": "easy",
-        "match_score_after": 78,
-        "score_improvement": 3,
-        "success_criteria": ["Criteria 1", "Criteria 2"]
-      }}
-    ],
-    
-    "quick_wins": [
-      {{
-        "skill": "Skill",
-        "why_quick_win": "Reason",
-        "time_needed": "2 weeks",
-        "impact": "Impact description"
-      }}
-    ],
-    
-    "long_term_investments": [
-      {{
-        "skill": "Skill",
-        "why_important": "Reason",
-        "time_needed": "3 months",
-        "high_value_because": "Reason"
-      }}
-    ],
-    
-    "key_recommendations": [
-      "Recommendation 1",
-      "Recommendation 2"
-    ],
-    
-    "resource_summary": {{
-      "free_resources": 5,
-      "paid_resources": 2,
-      "total_estimated_cost": "$50",
-      "recommended_communities": ["Community 1"]
-    }},
-    
-    "motivation_tips": [
-      "Tip 1",
-      "Tip 2"
-    ]
-  }}
+  "summary": "One sentence overview",
+  "total_months": 6,
+  "final_match_score": 90,
+  "milestones": [
+    {{
+      "id": "m1",
+      "month_start": 1,
+      "month_end": 2,
+      "skill": "Docker",
+      "priority_score": 91.1,
+      "duration_weeks": 6,
+      "resources": [
+        {{
+          "name": "Docker for Beginners",
+          "platform": "YouTube",
+          "cost": "free",
+          "url_hint": "search docker for beginners youtube"
+        }}
+      ],
+      "practice_projects": [
+        "Containerize a Flask app"
+      ],
+      "match_score_after": 80,
+      "score_improvement": 5
+    }}
+  ]
 }}"""
-        
-        return prompt
-    
-    def _parse_gemini_response(self, response_text: str) -> Dict:
-        """Parse Gemini's JSON response"""
-        
-        # Remove markdown code blocks if present
-        response_text = response_text.strip()
-        if response_text.startswith("```json"):
-            response_text = response_text[7:]
-        if response_text.startswith("```"):
-            response_text = response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-        
-        response_text = response_text.strip()
-        
+
+
+def _call_groq(prompt: str, api_key: str, retries: int = 3) -> str:
+    if not HAS_GROQ or Groq is None:
+        raise ImportError("groq package is not installed.")
+
+    client = Groq(api_key=api_key) if api_key else Groq()
+    for attempt in range(retries):
         try:
-            learning_path = json.loads(response_text)
-            return learning_path
-        except json.JSONDecodeError as e:
-            print(f"Error parsing JSON: {e}")
-            print(f"Response preview: {response_text[:200]}...")
-            raise ValueError(f"Failed to parse Gemini response as JSON")
-    
-    def _validate_learning_path(self, learning_path: Dict) -> Dict:
-        """Validate learning path structure"""
-        
-        if "learning_path" not in learning_path:
-            raise ValueError("Missing 'learning_path' key in response")
-        
-        path = learning_path["learning_path"]
-        
-        # Ensure milestones exist
-        if "milestones" not in path or not path["milestones"]:
-            raise ValueError("Learning path must have at least one milestone")
-        
-        return learning_path
-    
-    def _fallback_learning_path(self, missing_skills: List[Dict], job_title: str) -> Dict:
-        """Fallback if API fails"""
-        
-        # Ensure missing_skills is not empty
-        if not missing_skills:
-            missing_skills = [
-                {
-                    "skill": f"Develop {job_title} expertise",
-                    "category": "CRITICAL",
-                    "priority_score": 80
-                }
-            ]
-        
-        milestones = []
-        
-        for i, skill in enumerate(missing_skills[:5], 1):
-            skill_name = skill.get("skill", f"Skill {i}") if isinstance(skill, dict) else str(skill)
-            category = skill.get("category", "IMPORTANT") if isinstance(skill, dict) else "IMPORTANT"
-            priority_score = skill.get("priority_score", 50) if isinstance(skill, dict) else 50
-            
-            milestones.append({
-                "month": i,
-                "week_range": f"{(i-1)*4+1}-{i*4}",
-                "skill": skill_name,
-                "category": category,
-                "priority_score": priority_score,
-                "learning_objectives": [
-                    f"Understand {skill_name} fundamentals",
-                    f"Build a small project with {skill_name}"
-                ],
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=2000,
+                temperature=0.3,
+                top_p=1,
+                stop=None,
+            )
+            return response.choices[0].message.content or ""
+        except Exception as exc:
+            if attempt == retries - 1:
+                raise RuntimeError(f"Groq API failed after {retries} attempts: {exc}") from exc
+            time.sleep(2**attempt)
+    raise RuntimeError("Groq API did not return a response.")
+
+
+def _extract_json(raw: str) -> dict:
+    raw = re.sub(r"```(?:json)?", "", raw).strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", raw, flags=re.DOTALL)
+        if match:
+            return json.loads(match.group(0))
+        raise ValueError("No valid JSON found in Groq response.")
+
+
+def _normalize_roadmap(result: dict, match_score: float) -> dict:
+    milestones = result.get("milestones", [])
+    normalized = {
+        "summary": result.get("summary", "Personalized roadmap generated from your missing skills and priorities."),
+        "total_months": int(result.get("total_months", len(milestones) or 1)),
+        "final_match_score": int(result.get("final_match_score", min(95, int(match_score) + 15))),
+        "milestones": [],
+    }
+
+    for index, milestone in enumerate(milestones, 1):
+        normalized["milestones"].append(
+            {
+                "id": milestone.get("id", f"m{index}"),
+                "month_start": int(milestone.get("month_start", index)),
+                "month_end": int(milestone.get("month_end", milestone.get("month_start", index))),
+                "skill": milestone.get("skill", f"Skill {index}"),
+                "priority_score": float(milestone.get("priority_score", 70.0)),
+                "duration_weeks": int(milestone.get("duration_weeks", 4)),
+                "resources": milestone.get("resources", []),
+                "practice_projects": milestone.get("practice_projects", []),
+                "match_score_after": int(milestone.get("match_score_after", min(95, int(match_score) + index * 4))),
+                "score_improvement": int(milestone.get("score_improvement", 4)),
+            }
+        )
+
+    return normalized
+
+
+def _fallback_learning_path(
+    current_skills: list[str],
+    missing_skills: list[str],
+    priority_rankings: dict[str, float],
+    match_score: float,
+    target_role: str,
+) -> dict:
+    ranked = sorted(
+        missing_skills,
+        key=lambda skill: priority_rankings.get(skill.lower(), priority_rankings.get(skill, 50.0)),
+        reverse=True,
+    )
+    milestones = []
+    current_score = int(match_score)
+    for index, skill in enumerate(ranked[:6], 1):
+        improvement = max(2, min(8, int(priority_rankings.get(skill.lower(), priority_rankings.get(skill, 50.0)) // 15)))
+        current_score = min(95, current_score + improvement)
+        milestones.append(
+            {
+                "id": f"m{index}",
+                "month_start": index,
+                "month_end": index,
+                "skill": skill,
+                "priority_score": float(priority_rankings.get(skill.lower(), priority_rankings.get(skill, 50.0))),
+                "duration_weeks": 4,
                 "resources": [
                     {
-                        "type": "search",
-                        "name": f"Search '{skill_name}' on YouTube/Coursera/Udemy",
-                        "platform": "Multiple",
-                        "duration": "Variable",
-                        "cost": "free/paid"
+                        "name": f"{skill.title()} Official Documentation",
+                        "platform": "docs",
+                        "cost": "free",
+                        "url_hint": f"search {skill} official docs",
                     }
                 ],
-                "practice_projects": [
-                    f"Build a project using {skill_name}"
-                ],
-                "estimated_hours_per_week": 8,
-                "difficulty": "moderate",
-                "match_score_after": 75 + (i * 3),
-                "score_improvement": 3,
-                "success_criteria": [
-                    f"Understand core concepts of {skill_name}",
-                    "Completed at least one project"
-                ]
-            })
-        
-        first_skill = missing_skills[0].get("skill", "First skill") if missing_skills and isinstance(missing_skills[0], dict) else "First skill"
-        
-        return {
-            "learning_path": {
-                "initial_match_score": 70,
-                "target_match_score": 85,
-                "total_duration_months": len(milestones),
-                "estimated_hours_total": len(milestones) * 32,
-                "phases": [],
-                "milestones": milestones,
-                "quick_wins": [
-                    {
-                        "skill": first_skill,
-                        "why_quick_win": "Start with highest priority",
-                        "time_needed": "1-2 weeks",
-                        "impact": "Build momentum"
-                    }
-                ],
-                "key_recommendations": [
-                    "Search for online courses on platforms like Coursera, Udemy, YouTube",
-                    "Join communities and forums for the skills you're learning",
-                    "Build projects to gain practical experience",
-                    "Connect with mentors in the field"
-                ],
-                "resource_summary": {
-                    "free_resources": 5,
-                    "paid_resources": 2,
-                    "total_estimated_cost": "varies",
-                    "recommended_communities": ["Reddit communities", "Discord servers", "GitHub discussions"]
-                },
-                "motivation_tips": [
-                    "Track progress weekly",
-                    "Celebrate small wins",
-                    "Join study groups or communities"
-                ],
-                "error": "Note: Using rule-based learning path. For AI-personalized paths, please set up Gemini API key."
+                "practice_projects": [f"Build a small project using {skill}"],
+                "match_score_after": current_score,
+                "score_improvement": improvement,
             }
+        )
+
+    return {
+        "summary": f"Structured roadmap for reaching {target_role} using your highest-priority missing skills.",
+        "total_months": len(milestones),
+        "final_match_score": current_score,
+        "milestones": milestones,
+    }
+
+
+def generate_learning_path(
+    current_skills: list[str],
+    missing_skills: list[str],
+    priority_rankings: dict[str, float],
+    match_score: float,
+    target_role: str,
+    hours_per_day: float = 2.0,
+    learning_style: str = "hands-on",
+    budget: str = "budget-friendly",
+    use_cache: bool = True,
+    api_key: str | None = None,
+) -> dict:
+    load_dotenv()
+    api_key = api_key or os.getenv("GROQ_API_KEY")
+
+    payload = {
+        "current_skills": sorted(current_skills),
+        "missing_skills": sorted(missing_skills),
+        "priority_rankings": priority_rankings,
+        "match_score": match_score,
+        "target_role": target_role,
+        "hours_per_day": hours_per_day,
+        "learning_style": learning_style,
+        "budget": budget,
+    }
+    key = _cache_key(payload)
+
+    if use_cache:
+        cached = _load_cache(key)
+        if cached:
+            cached["_from_cache"] = True
+            return cached
+
+    if not api_key or not HAS_GROQ:
+        fallback = _fallback_learning_path(
+            current_skills=current_skills,
+            missing_skills=missing_skills,
+            priority_rankings=priority_rankings,
+            match_score=match_score,
+            target_role=target_role,
+        )
+        fallback["_from_cache"] = False
+        fallback["_provider"] = "fallback"
+        _save_cache(key, fallback)
+        return fallback
+
+    prompt = _build_prompt(**payload)
+    raw = _call_groq(prompt, api_key=api_key)
+    result = _extract_json(raw)
+    normalized = _normalize_roadmap(result, match_score)
+    normalized["_from_cache"] = False
+    normalized["_provider"] = "groq"
+    _save_cache(key, normalized)
+    return normalized
+
+
+class LLMLearningPathGenerator:
+    """Compatibility wrapper used by the skill-gap pipeline."""
+
+    def __init__(self):
+        load_dotenv()
+        self.api_key = os.getenv("GROQ_API_KEY")
+        self.available = bool(self.api_key and HAS_GROQ)
+
+    def generate_learning_path(
+        self,
+        user_skills: list[str],
+        missing_skills: list[dict[str, Any]],
+        job_title: str,
+        job_description: str,
+        current_match_score: float,
+        user_context: dict[str, Any] | None = None,
+    ) -> dict:
+        user_context = user_context or {}
+        skill_names = [item.get("skill", "") for item in missing_skills if item.get("skill")]
+        priority_rankings = {
+            item.get("skill", "").lower(): float(item.get("priority_score", 50.0))
+            for item in missing_skills
+            if item.get("skill")
+        }
+
+        roadmap = generate_learning_path(
+            current_skills=user_skills,
+            missing_skills=skill_names,
+            priority_rankings=priority_rankings,
+            match_score=current_match_score,
+            target_role=job_title,
+            hours_per_day=float(user_context.get("hours_per_day", 2.0)),
+            learning_style=str(user_context.get("learning_style", "hands-on")),
+            budget=str(user_context.get("budget", "budget-friendly")),
+            api_key=self.api_key,
+        )
+
+        return {
+            "learning_path": roadmap,
+            "provider": roadmap.get("_provider", "fallback"),
         }

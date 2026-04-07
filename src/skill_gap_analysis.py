@@ -8,6 +8,7 @@ from src.gap_identifier import SkillGapIdentifier
 from src.gap_categorizer import GapCategorizer
 from src.priority_ranker import PriorityRanker
 from src.learning_path_generator import LearningPathGenerator
+from src.skill_graph import SkillGraphAnalyzer
 from typing import Dict, List, Optional
 import logging
 
@@ -36,6 +37,7 @@ class SkillGapAnalysis:
         self.categorizer = GapCategorizer()
         self.ranker = PriorityRanker(trend_data=trend_data)
         self.path_generator = LearningPathGenerator()
+        self.skill_graph = SkillGraphAnalyzer()
         self.logger = logger
         
         # Initialize LLM-powered learning path generator (optional)
@@ -46,14 +48,14 @@ class SkillGapAnalysis:
         if HAS_LLM and LLMLearningPathGenerator:
             try:
                 self.llm_generator = LLMLearningPathGenerator()
-                self.use_llm = True
-                print("✓ LLM-powered learning paths enabled (Gemini API)")
+                self.use_llm = bool(getattr(self.llm_generator, "available", True))
+                print("LLM-powered learning paths enabled")
             except Exception as e:
-                print(f"⚠ LLM not available: {e}")
-                print("  Using rule-based learning paths instead")
+                print(f"LLM not available: {e}")
+                print("Using rule-based learning paths instead")
         else:
-            print("⚠ LLM module not available")
-            print("  Using rule-based learning paths instead")
+            print("LLM module not available")
+            print("Using rule-based learning paths instead")
     
     def analyze_for_job(self, user_skills: List[str], job_data: Dict,
                        current_match_score: float = 0, user_context: Optional[Dict] = None,
@@ -94,7 +96,7 @@ class SkillGapAnalysis:
 
         # Provide default current_match_score if not provided
         if current_match_score <= 0:
-            current_match_score = 50  # Default placeholder
+            current_match_score = 0
         
         # Step 1: Identify gaps
         gaps = self.identifier.identify_gaps(
@@ -138,8 +140,8 @@ class SkillGapAnalysis:
                     user_context
                 )
             except Exception as e:
-                print(f"⚠ LLM path generation failed: {e}")
-                print("  Falling back to rule-based path...")
+                print(f"LLM path generation failed: {e}")
+                print("Falling back to rule-based path...")
                 learning_path = self.path_generator.generate_learning_timeline(
                     ranked,
                     existing_skills,
@@ -154,6 +156,12 @@ class SkillGapAnalysis:
             )
         
         # Analysis complete
+        graph_analysis = self.skill_graph.analyze(
+            known_skills=user_skills,
+            missing_skills=[item["skill"] for item in ranked],
+            target_role=job_data.get("role", "Unknown"),
+        )
+
         return {
             "job_title": job_data.get("role", "Unknown"),
             "current_match_score": current_match_score,
@@ -166,6 +174,7 @@ class SkillGapAnalysis:
             "gaps_by_category": categorized,
             "ranked_priorities": ranked,
             "learning_path": learning_path,
+            "skill_graph": graph_analysis,
             "quick_wins": self._identify_quick_wins(ranked),
             "long_term_investments": self._identify_long_term(ranked),
             "user_analysis": {
@@ -173,7 +182,7 @@ class SkillGapAnalysis:
                 "implicit_skills": len(gaps["implicit_skills"]),
                 "total_effective_skills": len(gaps["user_skills_with_implicit"])
             },
-            "powered_by": "Gemini AI (LLM)" if self.use_llm else "Rule-based"
+            "powered_by": "Groq AI (LLM)" if self.use_llm else "Rule-based"
         }
     
     def analyze_for_multiple_jobs(self, user_skills: List[str],

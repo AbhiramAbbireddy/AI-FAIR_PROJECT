@@ -28,7 +28,7 @@ from src.config.settings import (
 )
 from src.models.schemas import ExtractedSkill
 from src.skill_extraction.normalizer import deduplicate, normalize_skill
-from src.skill_extraction.proficiency import detect_proficiency
+from src.skill_extraction.proficiency import estimate_skill_proficiency
 from src.skill_extraction.section_detector import detect_sections
 
 # ---------------------------------------------------------------------------
@@ -383,13 +383,15 @@ def extract_skills(
         if canon in seen:
             continue
         seen.add(canon)
-        prof = detect_proficiency(text, raw_name)
+        proficiency = estimate_skill_proficiency(text, raw_name)
         results.append(
             ExtractedSkill(
                 name=raw_name,
                 canonical=canon,
                 source_section=section,
-                proficiency=prof,
+                proficiency=proficiency.level,
+                proficiency_score=proficiency.score,
+                proficiency_evidence=proficiency.evidence,
             )
         )
 

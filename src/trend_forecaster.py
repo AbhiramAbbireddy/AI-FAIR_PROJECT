@@ -161,7 +161,7 @@ def _to_skill_trends(merged: pd.DataFrame, demand: pd.DataFrame) -> list[SkillTr
         on="skill",
         how="left",
     )
-    enriched["growth_pct"] = enriched["growth_pct"].fillna(0.0)
+    enriched["growth_pct"] = pd.to_numeric(enriched["growth_pct"], errors="coerce").fillna(0.0)
 
     return [
         SkillTrend(
